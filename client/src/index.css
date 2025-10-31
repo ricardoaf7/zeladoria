@@ -144,21 +144,21 @@
 
   --card-border: 0 0% 16%;
 
-  --sidebar: 210 4% 12%;
+  --sidebar: 244 33% 12%;
 
-  --sidebar-foreground: 210 4% 92%;
+  --sidebar-foreground: 244 15% 92%;
 
-  --sidebar-border: 210 4% 20%;
+  --sidebar-border: 244 28% 20%;
 
-  --sidebar-primary: 208 88% 32%;
+  --sidebar-primary: 244 50% 45%;
 
-  --sidebar-primary-foreground: 208 88% 96%;
+  --sidebar-primary-foreground: 244 50% 98%;
 
-  --sidebar-accent: 210 6% 16%;
+  --sidebar-accent: 244 25% 18%;
 
-  --sidebar-accent-foreground: 210 6% 90%;
+  --sidebar-accent-foreground: 244 20% 90%;
 
-  --sidebar-ring: 208 88% 42%;
+  --sidebar-ring: 244 50% 55%;
 
   --popover: 0 0% 14%;
 
@@ -211,6 +211,16 @@
   --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
   --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Custom colors for tooltips and team types */
+  --tooltip-bg: rgba(30, 28, 62, 0.95);
+  --tooltip-border: rgba(147, 129, 255, 0.3);
+  
+  /* Team type colors - Roçagem */
+  --team-giro-zero: 244 80% 65%;
+  --team-acabamento: 280 70% 65%;
+  --team-coleta: 180 70% 55%;
+  --team-capina: 140 65% 55%;
 }
 
 @layer base {
@@ -248,6 +258,39 @@
   /* Leaflet map container */
   .leaflet-container {
     font-family: var(--font-sans);
+  }
+
+  /* Leaflet tooltip styling with custom colors */
+  .leaflet-tooltip {
+    background-color: var(--tooltip-bg) !important;
+    border: 1px solid var(--tooltip-border) !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    backdrop-filter: blur(12px) !important;
+  }
+
+  .leaflet-tooltip::before {
+    border-top-color: var(--tooltip-bg) !important;
+  }
+
+  .leaflet-tooltip-top::before {
+    border-top-color: var(--tooltip-bg) !important;
+  }
+
+  .leaflet-tooltip-bottom::before {
+    border-bottom-color: var(--tooltip-bg) !important;
+  }
+
+  .leaflet-tooltip-left::before {
+    border-left-color: var(--tooltip-bg) !important;
+  }
+
+  .leaflet-tooltip-right::before {
+    border-right-color: var(--tooltip-bg) !important;
   }
 
   /* Hide ugly search cancel button in Chrome until we can style it properly */
