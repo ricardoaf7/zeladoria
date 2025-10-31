@@ -340,12 +340,13 @@ export function DashboardMap({
 
       const marker = L.marker([team.location.lat, team.location.lng], { icon });
 
-      marker.bindPopup(
+      marker.bindTooltip(
         `<div class="font-sans">
           <strong>Equipe ${team.id}: ${team.type}</strong><br/>
           Status: ${team.status}<br/>
           ${team.lote ? `Lote: ${team.lote}` : ''}
-        </div>`
+        </div>`,
+        { permanent: false, direction: 'top', offset: [0, -10] }
       );
 
       marker.addTo(layerGroup);

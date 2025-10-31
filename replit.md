@@ -6,6 +6,27 @@ This is a full-stack web application serving as an operational dashboard for CMT
 
 The application combines interactive mapping with service area management, automated scheduling algorithms, and team assignment capabilities. All user-facing content is in Brazilian Portuguese (pt-BR).
 
+## Recent Changes (October 31, 2025)
+
+### Sidebar Redesign
+- Implemented dark-themed accordion-style sidebar with expandable sections for "LIMPEZA URBANA" (7 services) and "RESÍDUOS" (5 services)
+- Added appropriate Lucide React icons for each service (Scissors for Roçagem, Flower2 for Jardins, etc.)
+- Header displays "CMTU Dashboard / Operações em Tempo Real"
+- Design matches IBM Carbon System principles with dark background and elevated containers
+
+### Interactive Map Enhancements
+- **Tooltips on Hover**: All map markers (areas and teams) display tooltips when hovering with mouse, showing relevant information (address, service type, scheduled date for areas; team ID, type, status, and lot for teams)
+- **Draggable Markers**: Areas without polygons can be repositioned by dragging markers; position changes persist automatically via PATCH /api/areas/:id/position endpoint
+- **Layer Ordering**: Area markers and polygons render above team markers to ensure clickability (implemented with bringToFront() with type guards)
+
+### Area Information Card
+- Replaced modal-based details with inline sidebar card (AreaInfoCard component)
+- Card displays when clicking on area marker/polygon: Location, Neighborhood, Type, Area m², Lot, History
+- Map automatically focuses on selected area with panTo and zoom
+- **Inline Editing**: Click "Editar" to transform fields into editable inputs; changes save via PATCH /api/areas/:id with Zod validation
+- **State Synchronization**: Implements onUpdate callback chain to ensure selectedArea state updates immediately after saving edits
+- Type safety guards prevent runtime errors (typeof checks for status field before string operations)
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
