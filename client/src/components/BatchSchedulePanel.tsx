@@ -43,6 +43,7 @@ export function BatchSchedulePanel({
       onClearSelection();
       setScheduledDate("");
       setDaysToComplete("");
+      onToggleSelectionMode();
     },
     onError: () => {
       toast({
