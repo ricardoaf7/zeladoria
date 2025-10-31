@@ -313,19 +313,19 @@ export function DashboardMap({
 
       if (team.type === "Giro Zero") {
         layerGroup = layerGroupsRef.current.teamsGiroZero;
-        teamColor = "hsl(244, 80%, 65%)";
+        teamColor = "hsl(var(--team-giro-zero))";
         teamLabel = "GZ";
       } else if (team.type === "Acabamento") {
         layerGroup = layerGroupsRef.current.teamsAcabamento;
-        teamColor = "hsl(280, 70%, 65%)";
+        teamColor = "hsl(var(--team-acabamento))";
         teamLabel = "AC";
       } else if (team.type === "Coleta") {
         layerGroup = layerGroupsRef.current.teamsColeta;
-        teamColor = "hsl(180, 70%, 55%)";
+        teamColor = "hsl(var(--team-coleta))";
         teamLabel = "CO";
       } else if (team.type === "Touceiras" || team.type === "Capina") {
         layerGroup = layerGroupsRef.current.teamsTouceiras;
-        teamColor = "hsl(140, 65%, 55%)";
+        teamColor = "hsl(var(--team-capina))";
         teamLabel = team.type === "Capina" ? "CP" : "TC";
       } else {
         return;
@@ -419,19 +419,19 @@ export function DashboardMap({
           <div className="space-y-1.5 text-xs border-t border-card-border pt-2">
             <div className="text-xs font-medium text-muted-foreground mb-1">Tipos de Equipe</div>
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(244, 80%, 65%)"}}>GZ</div>
+              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(var(--team-giro-zero))"}}>GZ</div>
               <span>Giro Zero</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(280, 70%, 65%)"}}>AC</div>
+              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(var(--team-acabamento))"}}>AC</div>
               <span>Acabamento</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(180, 70%, 55%)"}}>CO</div>
+              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(var(--team-coleta))"}}>CO</div>
               <span>Coleta</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(140, 65%, 55%)"}}>CP</div>
+              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(var(--team-capina))"}}>CP</div>
               <span>Capina</span>
             </div>
           </div>

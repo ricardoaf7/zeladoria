@@ -120,6 +120,16 @@
   /* Fallback for older browsers */
   --destructive-border: hsl(var(--destructive));
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Custom colors for tooltips and team types */
+  --tooltip-bg: rgba(30, 28, 62, 0.95);
+  --tooltip-border: rgba(147, 129, 255, 0.3);
+  
+  /* Team type colors - Roçagem */
+  --team-giro-zero: 244 80% 65%;
+  --team-acabamento: 280 70% 65%;
+  --team-coleta: 180 70% 55%;
+  --team-capina: 140 65% 55%;
 }
 
 .dark {
@@ -211,16 +221,6 @@
   --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
   --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Custom colors for tooltips and team types */
-  --tooltip-bg: rgba(30, 28, 62, 0.95);
-  --tooltip-border: rgba(147, 129, 255, 0.3);
-  
-  /* Team type colors - Roçagem */
-  --team-giro-zero: 244 80% 65%;
-  --team-acabamento: 280 70% 65%;
-  --team-coleta: 180 70% 55%;
-  --team-capina: 140 65% 55%;
 }
 
 @layer base {
