@@ -24,6 +24,8 @@ interface DashboardMapProps {
   };
   onAreaClick: (area: ServiceArea) => void;
   mapRef?: React.MutableRefObject<L.Map | null>;
+  selectionMode?: boolean;
+  selectedAreaIds?: Set<number>;
 }
 
 export function DashboardMap({
@@ -33,6 +35,8 @@ export function DashboardMap({
   layerFilters,
   onAreaClick,
   mapRef: externalMapRef,
+  selectionMode = false,
+  selectedAreaIds = new Set(),
 }: DashboardMapProps) {
   const { toast } = useToast();
   const internalMapRef = useRef<L.Map | null>(null);
@@ -177,7 +181,8 @@ export function DashboardMap({
 
       if (!layerGroup) return;
 
-      const color = getAreaColor(area, today);
+      const isSelected = selectedAreaIds.has(area.id);
+      const color = getAreaColor(area, today, isSelected);
       const isPulsing = area.status === "Em Execução";
 
       if (area.polygon && area.polygon.length > 0) {
@@ -263,7 +268,7 @@ export function DashboardMap({
         marker.addTo(layerGroup);
       }
     });
-  }, [rocagemAreas, onAreaClick]);
+  }, [rocagemAreas, onAreaClick, selectedAreaIds]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -450,7 +455,11 @@ export function DashboardMap({
   );
 }
 
-function getAreaColor(area: ServiceArea, today: Date): string {
+function getAreaColor(area: ServiceArea, today: Date, isSelected = false): string {
+  if (isSelected) {
+    return "#9333ea";
+  }
+
   if (area.status === "Em Execução") {
     return "#10b981";
   }

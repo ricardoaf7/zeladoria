@@ -9,6 +9,8 @@ import L from "leaflet";
 export default function Dashboard() {
   const [selectedArea, setSelectedArea] = useState<ServiceArea | null>(null);
   const [selectedService, setSelectedService] = useState<string>('rocagem');
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedAreaIds, setSelectedAreaIds] = useState<Set<number>>(new Set());
   const mapRef = useRef<L.Map | null>(null);
 
   const { data: rocagemAreas = [] } = useQuery<ServiceArea[]>({
@@ -47,11 +49,35 @@ export default function Dashboard() {
   };
 
   const handleAreaClick = (area: ServiceArea) => {
-    setSelectedArea(area);
+    if (selectionMode) {
+      setSelectedAreaIds(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(area.id)) {
+          newSet.delete(area.id);
+        } else {
+          newSet.add(area.id);
+        }
+        return newSet;
+      });
+    } else {
+      setSelectedArea(area);
+    }
   };
 
   const handleAreaUpdate = (updatedArea: ServiceArea) => {
     setSelectedArea(updatedArea);
+  };
+
+  const handleToggleSelectionMode = () => {
+    setSelectionMode(prev => !prev);
+    if (selectionMode) {
+      setSelectedAreaIds(new Set());
+    }
+    setSelectedArea(null);
+  };
+
+  const handleClearSelection = () => {
+    setSelectedAreaIds(new Set());
   };
 
   return (
@@ -63,6 +89,11 @@ export default function Dashboard() {
           selectedArea={selectedArea}
           onAreaClose={() => setSelectedArea(null)}
           onAreaUpdate={handleAreaUpdate}
+          selectionMode={selectionMode}
+          onToggleSelectionMode={handleToggleSelectionMode}
+          selectedAreaIds={selectedAreaIds}
+          onClearSelection={handleClearSelection}
+          rocagemAreas={rocagemAreas}
         />
         
         <SidebarInset className="flex-1 overflow-hidden">
@@ -85,6 +116,8 @@ export default function Dashboard() {
               }}
               onAreaClick={handleAreaClick}
               mapRef={mapRef}
+              selectionMode={selectionMode}
+              selectedAreaIds={selectedAreaIds}
             />
           </main>
         </SidebarInset>

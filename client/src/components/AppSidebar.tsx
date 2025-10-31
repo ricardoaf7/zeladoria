@@ -12,7 +12,8 @@ import {
   Recycle,
   Sparkles,
   Wind,
-  Package
+  Package,
+  CheckSquare
 } from "lucide-react";
 import {
   Sidebar,
@@ -25,7 +26,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import { AreaInfoCard } from "./AreaInfoCard";
+import { BatchSchedulePanel } from "./BatchSchedulePanel";
 import { Separator } from "@/components/ui/separator";
 import type { ServiceArea } from "@shared/schema";
 
@@ -35,6 +38,11 @@ interface AppSidebarProps {
   selectedArea?: ServiceArea | null;
   onAreaClose?: () => void;
   onAreaUpdate?: (area: ServiceArea) => void;
+  selectionMode?: boolean;
+  onToggleSelectionMode?: () => void;
+  selectedAreaIds?: Set<number>;
+  onClearSelection?: () => void;
+  rocagemAreas?: ServiceArea[];
 }
 
 export function AppSidebar({
@@ -43,6 +51,11 @@ export function AppSidebar({
   selectedArea,
   onAreaClose,
   onAreaUpdate,
+  selectionMode = false,
+  onToggleSelectionMode,
+  selectedAreaIds = new Set(),
+  onClearSelection,
+  rocagemAreas = [],
 }: AppSidebarProps) {
   const handleServiceClick = (service: string) => {
     if (onServiceSelect) {
@@ -65,7 +78,14 @@ export function AppSidebar({
       </SidebarHeader>
 
       <SidebarContent className="px-4">
-        {selectedArea && onAreaClose ? (
+        {selectionMode ? (
+          <BatchSchedulePanel
+            selectedCount={selectedAreaIds.size}
+            selectedAreaIds={selectedAreaIds}
+            onToggleSelectionMode={onToggleSelectionMode!}
+            onClearSelection={onClearSelection!}
+          />
+        ) : selectedArea && onAreaClose ? (
           <div className="mb-4">
             <AreaInfoCard 
               area={selectedArea} 
@@ -77,9 +97,22 @@ export function AppSidebar({
         ) : null}
         
         <div className="mb-4">
-          <div className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-muted-foreground">
-            <Layers className="h-4 w-4" />
-            <span>Serviços</span>
+          <div className="flex items-center justify-between px-3 py-2">
+            <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+              <Layers className="h-4 w-4" />
+              <span>Serviços</span>
+            </div>
+            {selectedService === 'rocagem' && onToggleSelectionMode && (
+              <Button
+                variant={selectionMode ? "default" : "outline"}
+                size="sm"
+                onClick={onToggleSelectionMode}
+                data-testid="button-toggle-selection"
+              >
+                <CheckSquare className="h-4 w-4 mr-1.5" />
+                {selectionMode ? "Selecionando" : "Selecionar"}
+              </Button>
+            )}
           </div>
 
           <Accordion type="single" collapsible defaultValue="limpeza" className="space-y-2">
