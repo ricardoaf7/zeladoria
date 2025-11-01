@@ -139,15 +139,15 @@ export function AppSidebar({
                 <div className="space-y-1">
                   <button
                     onClick={() => handleServiceClick('rocagem')}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
+                    className={`w-full flex items-center justify-start gap-3 px-4 py-2.5 rounded-md text-sm text-left transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'rocagem' 
                         ? 'bg-accent text-accent-foreground font-medium' 
                         : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-rocagem"
                   >
-                    <Scissors className="h-4 w-4 text-emerald-400" />
-                    <span>Capina e Roçagem de Áreas Públicas</span>
+                    <Scissors className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+                    <span className="text-left">Capina e Roçagem de Áreas Públicas</span>
                   </button>
                   
                   {selectedService === 'rocagem' && (
