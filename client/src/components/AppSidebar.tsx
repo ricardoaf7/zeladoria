@@ -129,7 +129,7 @@ export function AppSidebar({
             )}
           </div>
 
-          <Accordion type="single" collapsible defaultValue="limpeza" className="space-y-2">
+          <Accordion type="single" collapsible className="space-y-2">
             <AccordionItem value="limpeza" className="border-0">
               <AccordionTrigger 
                 className="rounded-lg bg-emerald-600/20 dark:bg-emerald-400/20 hover:bg-emerald-600/30 dark:hover:bg-emerald-400/30 px-4 py-3 hover:no-underline data-[state=open]:bg-emerald-600/30 dark:data-[state=open]:bg-emerald-400/30 border border-emerald-600/40 dark:border-emerald-400/40"
