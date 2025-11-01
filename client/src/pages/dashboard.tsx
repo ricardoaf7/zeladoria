@@ -15,10 +15,10 @@ export default function Dashboard() {
   const [selectedAreaIds, setSelectedAreaIds] = useState<Set<number>>(new Set());
   const [filters, setFilters] = useState<FilterCriteria>({
     search: "",
-    bairro: "",
-    lote: "",
-    status: "",
-    tipo: "",
+    bairro: "all",
+    lote: "all",
+    status: "all",
+    tipo: "all",
   });
   const mapRef = useRef<L.Map | null>(null);
 
@@ -40,7 +40,11 @@ export default function Dashboard() {
 
   // Filtrar áreas baseado nos critérios
   const filteredRocagemAreas = useMemo(() => {
-    if (!filters.search && !filters.bairro && !filters.lote && !filters.status && !filters.tipo) {
+    if (!filters.search && 
+        (!filters.bairro || filters.bairro === "all") && 
+        (!filters.lote || filters.lote === "all") && 
+        (!filters.status || filters.status === "all") && 
+        (!filters.tipo || filters.tipo === "all")) {
       return rocagemAreas;
     }
 
@@ -54,16 +58,20 @@ export default function Dashboard() {
         }
       }
 
-      if (filters.bairro && area.bairro !== filters.bairro) return false;
-      if (filters.lote && area.lote?.toString() !== filters.lote) return false;
-      if (filters.status && area.status !== filters.status) return false;
-      if (filters.tipo && area.tipo !== filters.tipo) return false;
+      if (filters.bairro && filters.bairro !== "all" && area.bairro !== filters.bairro) return false;
+      if (filters.lote && filters.lote !== "all" && area.lote?.toString() !== filters.lote) return false;
+      if (filters.status && filters.status !== "all" && area.status !== filters.status) return false;
+      if (filters.tipo && filters.tipo !== "all" && area.tipo !== filters.tipo) return false;
 
       return true;
     });
   }, [rocagemAreas, filters]);
 
-  const hasActiveFilters = filters.search || filters.bairro || filters.lote || filters.status || filters.tipo;
+  const hasActiveFilters = filters.search || 
+    (filters.bairro && filters.bairro !== "all") || 
+    (filters.lote && filters.lote !== "all") || 
+    (filters.status && filters.status !== "all") || 
+    (filters.tipo && filters.tipo !== "all");
 
   useEffect(() => {
     if (selectedArea && mapRef.current) {

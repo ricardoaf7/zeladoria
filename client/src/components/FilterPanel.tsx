@@ -40,24 +40,28 @@ export function FilterPanel({ areas, filters, onFilterChange, filteredCount }: F
     return Array.from(unique).sort();
   }, [areas]);
 
-  const hasActiveFilters = filters.search || filters.bairro || filters.lote || filters.status || filters.tipo;
+  const hasActiveFilters = filters.search || 
+    (filters.bairro && filters.bairro !== "all") || 
+    (filters.lote && filters.lote !== "all") || 
+    (filters.status && filters.status !== "all") || 
+    (filters.tipo && filters.tipo !== "all");
 
   const handleClear = () => {
     onFilterChange({
       search: "",
-      bairro: "",
-      lote: "",
-      status: "",
-      tipo: "",
+      bairro: "all",
+      lote: "all",
+      status: "all",
+      tipo: "all",
     });
   };
 
   const activeFilterCount = [
     filters.search,
-    filters.bairro,
-    filters.lote,
-    filters.status,
-    filters.tipo
+    filters.bairro !== "all" && filters.bairro,
+    filters.lote !== "all" && filters.lote,
+    filters.status !== "all" && filters.status,
+    filters.tipo !== "all" && filters.tipo
   ].filter(Boolean).length;
 
   return (
@@ -112,7 +116,7 @@ export function FilterPanel({ areas, filters, onFilterChange, filteredCount }: F
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="1">Lote 1</SelectItem>
                   <SelectItem value="2">Lote 2</SelectItem>
                 </SelectContent>
@@ -129,7 +133,7 @@ export function FilterPanel({ areas, filters, onFilterChange, filteredCount }: F
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="Pendente">Pendente</SelectItem>
                   <SelectItem value="Em Execução">Em Execução</SelectItem>
                   <SelectItem value="Concluído">Concluído</SelectItem>
@@ -148,7 +152,7 @@ export function FilterPanel({ areas, filters, onFilterChange, filteredCount }: F
                 <SelectValue placeholder="Todos os bairros" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                <SelectItem value="">Todos os bairros</SelectItem>
+                <SelectItem value="all">Todos os bairros</SelectItem>
                 {bairros.map((bairro) => (
                   <SelectItem key={bairro} value={bairro}>
                     {bairro}
@@ -168,7 +172,7 @@ export function FilterPanel({ areas, filters, onFilterChange, filteredCount }: F
                 <SelectValue placeholder="Todos os tipos" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                <SelectItem value="">Todos os tipos</SelectItem>
+                <SelectItem value="all">Todos os tipos</SelectItem>
                 {tipos.slice(0, 30).map((tipo) => (
                   <SelectItem key={tipo} value={tipo}>
                     {tipo}
