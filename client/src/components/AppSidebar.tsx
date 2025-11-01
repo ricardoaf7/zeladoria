@@ -15,6 +15,7 @@ import {
   Package,
   CheckSquare
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import operacoesLogo from "@assets/Operacoes_Logo_Negativo_1762017107891.png";
 import {
   Sidebar,
@@ -150,35 +151,45 @@ export function AppSidebar({
                     <span className="text-left">Capina e Roçagem de Áreas Públicas</span>
                   </button>
                   
-                  {selectedService === 'rocagem' && (
-                    <div className="mt-3 space-y-3 pl-2">
-                      {filters && onFilterChange && (
-                        <>
-                          <FilterPanel
-                            areas={rocagemAreas}
-                            filters={filters}
-                            onFilterChange={onFilterChange}
-                            filteredCount={filteredCount}
-                          />
-                          <Separator className="my-3" />
-                        </>
-                      )}
+                  <AnimatePresence>
+                    {selectedService === 'rocagem' && (
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0, y: -10 }}
+                        animate={{ opacity: 1, height: "auto", y: 0 }}
+                        exit={{ opacity: 0, height: 0, y: -10 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-3 space-y-3 pl-2">
+                          {filters && onFilterChange && (
+                            <>
+                              <FilterPanel
+                                areas={rocagemAreas}
+                                filters={filters}
+                                onFilterChange={onFilterChange}
+                                filteredCount={filteredCount}
+                              />
+                              <Separator className="my-3" />
+                            </>
+                          )}
 
-                      {onRegistrationModeChange && (
-                        <>
-                          <DailyRegistrationPanel
-                            selectedAreas={Array.from(selectedAreaIds)}
-                            onModeChange={onRegistrationModeChange}
-                            onClearSelection={onClearSelection!}
-                          />
-                          <Separator className="my-3" />
-                        </>
-                      )}
+                          {onRegistrationModeChange && (
+                            <>
+                              <DailyRegistrationPanel
+                                selectedAreas={Array.from(selectedAreaIds)}
+                                onModeChange={onRegistrationModeChange}
+                                onClearSelection={onClearSelection!}
+                              />
+                              <Separator className="my-3" />
+                            </>
+                          )}
 
-                      <MapLegend />
-                      <Separator className="my-3" />
-                    </div>
-                  )}
+                          <MapLegend />
+                          <Separator className="my-3" />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   <button
                     onClick={() => handleServiceClick('jardins')}
