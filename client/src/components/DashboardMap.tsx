@@ -385,60 +385,6 @@ export function DashboardMap({
     <div className="relative w-full h-full">
       <div ref={mapContainerRef} className="w-full h-full" data-testid="map-container" />
 
-      <div className="absolute bottom-4 left-4 z-[1000] backdrop-blur-sm border rounded-md p-3 shadow-lg" style={{backgroundColor: 'var(--tooltip-bg)', borderColor: 'var(--tooltip-border)'}} data-testid="map-legend">
-        <h3 className="text-xs font-semibold mb-2" style={{color: 'hsl(var(--sidebar-foreground))'}}>Legenda</h3>
-        
-        <div className="space-y-3" style={{color: 'hsl(var(--sidebar-foreground))'}}>
-          <div className="space-y-1.5 text-xs">
-            <div className="text-xs font-medium mb-1" style={{color: 'hsl(var(--sidebar-foreground))', opacity: 0.8}}>Status das Áreas</div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-map-executing animate-pulse"></div>
-              <span>Em Execução</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-map-today"></div>
-              <span>Hoje</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-map-next3days"></div>
-              <span>Próximos 3 Dias</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-map-nextWeek"></div>
-              <span>Próxima Semana</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-map-completedRecent"></div>
-              <span>Concluído Recente</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-map-pending"></div>
-              <span>Pendente</span>
-            </div>
-          </div>
-
-          <div className="space-y-1.5 text-xs border-t pt-2" style={{borderColor: 'var(--tooltip-border)'}}>
-            <div className="text-xs font-medium mb-1" style={{color: 'hsl(var(--sidebar-foreground))', opacity: 0.8}}>Tipos de Equipe</div>
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(var(--team-giro-zero))"}}>GZ</div>
-              <span>Giro Zero</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(var(--team-acabamento))"}}>AC</div>
-              <span>Acabamento</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(var(--team-coleta))"}}>CO</div>
-              <span>Coleta</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" style={{backgroundColor: "hsl(var(--team-capina))"}}>CP</div>
-              <span>Capina</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {pendingPolygon && (
         <PolygonAssignmentModal
           areas={rocagemAreas}
