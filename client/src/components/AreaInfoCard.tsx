@@ -270,12 +270,15 @@ export function AreaInfoCard({ area, onClose, onUpdate }: AreaInfoCardProps) {
                 <History className="h-4 w-4 text-muted-foreground" />
                 <h4 className="text-xs font-semibold">Histórico</h4>
               </div>
-              <ul className="space-y-1 text-xs text-muted-foreground">
-                {area.history.slice(0, 5).map((item, index) => (
-                  <li key={index}>
-                    • {new Date(item.date).toLocaleDateString('pt-BR')} - {item.status}
-                  </li>
-                ))}
+              <ul className="space-y-1 text-xs">
+                {area.history.slice(0, 5).reverse().map((item, index) => {
+                  const isForecast = item.type === 'forecast';
+                  return (
+                    <li key={index} className={isForecast ? "text-blue-600 dark:text-blue-400" : "text-green-600 dark:text-green-400"}>
+                      • {new Date(item.date).toLocaleDateString('pt-BR')} - {isForecast ? 'Previsto para' : 'Concluído em'} {item.status}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </>
