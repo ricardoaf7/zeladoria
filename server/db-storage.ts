@@ -213,6 +213,55 @@ export class DbStorage implements IStorage {
     return updated;
   }
 
+  async registerDailyMowing(areaIds: number[], date: string): Promise<void> {
+    // Importar algoritmo de agendamento
+    const { recalculateAfterCompletion } = await import('@shared/schedulingAlgorithm');
+    
+    // 1. Atualizar cada área com ultimaRocagem, adicionar histórico, marcar como Concluído
+    for (const areaId of areaIds) {
+      const area = await this.getAreaById(areaId);
+      if (!area) continue;
+      
+      const newHistory = [
+        ...(area.history || []),
+        {
+          date: date,
+          status: "Concluído",
+          observation: "Roçagem registrada pelo sistema",
+        }
+      ];
+      
+      await this.db
+        .update(serviceAreas)
+        .set({
+          ultimaRocagem: date,
+          status: "Concluído",
+          history: newHistory as any,
+          updatedAt: new Date(),
+        })
+        .where(eq(serviceAreas.id, areaId));
+    }
+    
+    // 2. Buscar todas as áreas e configuração
+    const allAreas = await this.getAllAreas('rocagem');
+    const config = await this.getConfig();
+    
+    // 3. Recalcular previsões para lotes afetados
+    const predictions = recalculateAfterCompletion(allAreas, areaIds, config);
+    
+    // 4. Atualizar previsões no banco
+    for (const prediction of predictions) {
+      await this.db
+        .update(serviceAreas)
+        .set({
+          proximaPrevisao: prediction.proximaPrevisao,
+          daysToComplete: prediction.daysToComplete,
+          updatedAt: new Date(),
+        })
+        .where(eq(serviceAreas.id, prediction.areaId));
+    }
+  }
+
   private mapDbAreaToServiceArea(dbArea: any): ServiceArea {
     return {
       id: dbArea.id,

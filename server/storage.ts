@@ -11,6 +11,7 @@ export interface IStorage {
   updateArea(id: number, data: Partial<ServiceArea>): Promise<ServiceArea | undefined>;
   addHistoryEntry(areaId: number, entry: { date: string; status: string; observation?: string }): Promise<ServiceArea | undefined>;
   batchScheduleAreas(areaIds: number[], scheduledDate: string, daysToComplete?: number): Promise<ServiceArea[]>;
+  registerDailyMowing(areaIds: number[], date: string): Promise<void>;
   
   // Teams
   getAllTeams(): Promise<Team[]>;
@@ -291,6 +292,38 @@ export class MemStorage implements IStorage {
       calculateMowingSchedule(this.rocagemAreas, this.config);
     }
     return this.config;
+  }
+
+  async registerDailyMowing(areaIds: number[], date: string): Promise<void> {
+    // Importar algoritmo de agendamento
+    const { recalculateAfterCompletion } = await import('@shared/schedulingAlgorithm');
+    
+    // 1. Atualizar cada área com ultimaRocagem, adicionar histórico, marcar como Concluído
+    for (const areaId of areaIds) {
+      const area = await this.getAreaById(areaId);
+      if (!area) continue;
+      
+      area.ultimaRocagem = date;
+      area.status = "Concluído";
+      area.history.push({
+        date: date,
+        status: "Concluído",
+        observation: "Roçagem registrada pelo sistema",
+      });
+    }
+    
+    // 2. Recalcular previsões para lotes afetados
+    const allAreas = this.rocagemAreas;
+    const predictions = recalculateAfterCompletion(allAreas, areaIds, this.config);
+    
+    // 3. Atualizar previsões em memória
+    for (const prediction of predictions) {
+      const area = await this.getAreaById(prediction.areaId);
+      if (area) {
+        area.proximaPrevisao = prediction.proximaPrevisao;
+        area.daysToComplete = prediction.daysToComplete;
+      }
+    }
   }
 }
 

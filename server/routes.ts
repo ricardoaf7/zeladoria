@@ -241,6 +241,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/areas/register-daily", async (req, res) => {
+    try {
+      const registerSchema = z.object({
+        areaIds: z.array(z.number()).min(1, "Selecione pelo menos uma área"),
+        date: z.string(),
+      });
+
+      const { areaIds, date } = registerSchema.parse(req.body);
+      await storage.registerDailyMowing(areaIds, date);
+
+      res.json({ 
+        success: true, 
+        message: `${areaIds.length} área(s) registrada(s) com sucesso`,
+        count: areaIds.length 
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      } else {
+        console.error("Error registering daily mowing:", error);
+        res.status(500).json({ error: "Falha ao registrar roçagem" });
+      }
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
