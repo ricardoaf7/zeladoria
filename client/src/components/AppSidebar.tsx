@@ -91,36 +91,6 @@ export function AppSidebar({
       </SidebarHeader>
 
       <SidebarContent className="px-4">
-        {selectedService === 'rocagem' && filters && onFilterChange && (
-          <div className="mb-4">
-            <FilterPanel
-              areas={rocagemAreas}
-              filters={filters}
-              onFilterChange={onFilterChange}
-              filteredCount={filteredCount}
-            />
-            <Separator className="my-4" />
-          </div>
-        )}
-
-        {selectedService === 'rocagem' && onRegistrationModeChange && (
-          <div className="mb-4">
-            <DailyRegistrationPanel
-              selectedAreas={Array.from(selectedAreaIds)}
-              onModeChange={onRegistrationModeChange}
-              onClearSelection={onClearSelection!}
-            />
-            <Separator className="my-4" />
-          </div>
-        )}
-
-        {selectedService === 'rocagem' && (
-          <div className="mb-4">
-            <MapLegend />
-            <Separator className="my-4" />
-          </div>
-        )}
-        
         {selectedArea && onAreaClose && !isRegistrationMode ? (
           <div className="mb-4">
             <AreaInfoCard 
@@ -159,7 +129,7 @@ export function AppSidebar({
               >
                 <div className="flex items-center gap-3">
                   <Leaf className="h-5 w-5 text-emerald-400" />
-                  <span className="font-semibold text-sm text-foreground">LIMPEZA URBANA</span>
+                  <span className="font-semibold text-sm text-white">LIMPEZA URBANA</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-2 pt-2 px-2">
@@ -169,20 +139,50 @@ export function AppSidebar({
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'rocagem' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-rocagem"
                   >
                     <img src={workerIcon} alt="" className="h-5 w-5" />
                     <span>Capina e Roçagem de Áreas Públicas</span>
                   </button>
+                  
+                  {selectedService === 'rocagem' && (
+                    <div className="mt-3 space-y-3 pl-2">
+                      {filters && onFilterChange && (
+                        <>
+                          <FilterPanel
+                            areas={rocagemAreas}
+                            filters={filters}
+                            onFilterChange={onFilterChange}
+                            filteredCount={filteredCount}
+                          />
+                          <Separator className="my-3" />
+                        </>
+                      )}
+
+                      {onRegistrationModeChange && (
+                        <>
+                          <DailyRegistrationPanel
+                            selectedAreas={Array.from(selectedAreaIds)}
+                            onModeChange={onRegistrationModeChange}
+                            onClearSelection={onClearSelection!}
+                          />
+                          <Separator className="my-3" />
+                        </>
+                      )}
+
+                      <MapLegend />
+                      <Separator className="my-3" />
+                    </div>
+                  )}
 
                   <button
                     onClick={() => handleServiceClick('jardins')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'jardins' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-jardins"
                   >
@@ -195,7 +195,7 @@ export function AppSidebar({
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'boa-praca' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-boa-praca"
                   >
@@ -208,7 +208,7 @@ export function AppSidebar({
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'manutencao-lagos' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-manutencao-lagos"
                   >
@@ -221,7 +221,7 @@ export function AppSidebar({
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'varricao' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-varricao"
                   >
@@ -234,7 +234,7 @@ export function AppSidebar({
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'podas' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-podas"
                   >
@@ -247,7 +247,7 @@ export function AppSidebar({
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'chafariz' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-chafariz"
                   >
@@ -265,7 +265,7 @@ export function AppSidebar({
               >
                 <div className="flex items-center gap-3">
                   <Recycle className="h-5 w-5 text-blue-400" />
-                  <span className="font-semibold text-sm text-foreground">RESÍDUOS</span>
+                  <span className="font-semibold text-sm text-white">RESÍDUOS</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-2 pt-2 px-2">
@@ -275,7 +275,7 @@ export function AppSidebar({
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'coleta-organicos' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-coleta-organicos"
                   >
@@ -288,7 +288,7 @@ export function AppSidebar({
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'coleta-reciclaveis' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-coleta-reciclaveis"
                   >
@@ -301,7 +301,7 @@ export function AppSidebar({
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'coleta-especiais' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-coleta-especiais"
                   >
@@ -314,7 +314,7 @@ export function AppSidebar({
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'limpeza-bocas' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-limpeza-bocas"
                   >
@@ -327,7 +327,7 @@ export function AppSidebar({
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'pevs' 
                         ? 'bg-accent text-accent-foreground font-medium' 
-                        : 'text-foreground/90 hover:text-foreground'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                     data-testid="service-pevs"
                   >
