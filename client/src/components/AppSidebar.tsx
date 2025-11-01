@@ -15,6 +15,7 @@ import {
   Package,
   CheckSquare
 } from "lucide-react";
+import operacoesLogo from "@assets/Operacoes_Logo_Negativo_1762017107891.png";
 import {
   Sidebar,
   SidebarContent,
@@ -71,14 +72,13 @@ export function AppSidebar({
   return (
     <Sidebar className="border-r-0">
       <SidebarHeader className="p-6 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80">
-            <MapPin className="h-6 w-6 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-foreground">CMTU Dashboard</h1>
-            <p className="text-xs text-muted-foreground">Operações em Tempo Real</p>
-          </div>
+        <div className="flex flex-col gap-2">
+          <img 
+            src={operacoesLogo} 
+            alt="Diretoria de Operações"
+            className="h-16 w-auto object-contain"
+          />
+          <p className="text-xs text-muted-foreground text-center">Operações em Tempo Real</p>
         </div>
       </SidebarHeader>
 
