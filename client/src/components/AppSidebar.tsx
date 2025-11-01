@@ -16,7 +16,6 @@ import {
   CheckSquare
 } from "lucide-react";
 import operacoesLogo from "@assets/Operacoes_Logo_Negativo_1762017107891.png";
-import workerIcon from "@assets/generated_images/Worker_with_grass_trimmer_icon_2445ad6f.png";
 import {
   Sidebar,
   SidebarContent,
@@ -73,7 +72,11 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const handleServiceClick = (service: string) => {
     if (onServiceSelect) {
-      onServiceSelect(service);
+      if (selectedService === service) {
+        onServiceSelect('');
+      } else {
+        onServiceSelect(service);
+      }
     }
   };
 
@@ -143,7 +146,7 @@ export function AppSidebar({
                     }`}
                     data-testid="service-rocagem"
                   >
-                    <img src={workerIcon} alt="" className="h-5 w-5" />
+                    <Scissors className="h-4 w-4 text-emerald-400" />
                     <span>Capina e Roçagem de Áreas Públicas</span>
                   </button>
                   
