@@ -16,6 +16,7 @@ import {
   CheckSquare
 } from "lucide-react";
 import operacoesLogo from "@assets/Operacoes_Logo_Negativo_1762017107891.png";
+import workerIcon from "@assets/generated_images/Worker_with_grass_trimmer_icon_2445ad6f.png";
 import {
   Sidebar,
   SidebarContent,
@@ -148,21 +149,21 @@ export function AppSidebar({
                     onClick={() => handleServiceClick('rocagem')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'rocagem' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-rocagem"
                   >
-                    <Scissors className="h-4 w-4 text-emerald-400" />
-                    <span>Roçagem Áreas Públicas</span>
+                    <img src={workerIcon} alt="" className="h-5 w-5" />
+                    <span>Capina e Roçagem de Áreas Públicas</span>
                   </button>
 
                   <button
                     onClick={() => handleServiceClick('jardins')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'jardins' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-jardins"
                   >
@@ -174,8 +175,8 @@ export function AppSidebar({
                     onClick={() => handleServiceClick('boa-praca')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'boa-praca' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-boa-praca"
                   >
@@ -187,8 +188,8 @@ export function AppSidebar({
                     onClick={() => handleServiceClick('manutencao-lagos')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'manutencao-lagos' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-manutencao-lagos"
                   >
@@ -200,8 +201,8 @@ export function AppSidebar({
                     onClick={() => handleServiceClick('varricao')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'varricao' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-varricao"
                   >
@@ -213,8 +214,8 @@ export function AppSidebar({
                     onClick={() => handleServiceClick('podas')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'podas' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-podas"
                   >
@@ -226,8 +227,8 @@ export function AppSidebar({
                     onClick={() => handleServiceClick('chafariz')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'chafariz' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-chafariz"
                   >
@@ -254,8 +255,8 @@ export function AppSidebar({
                     onClick={() => handleServiceClick('coleta-organicos')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'coleta-organicos' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-coleta-organicos"
                   >
@@ -267,8 +268,8 @@ export function AppSidebar({
                     onClick={() => handleServiceClick('coleta-reciclaveis')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'coleta-reciclaveis' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-coleta-reciclaveis"
                   >
@@ -280,8 +281,8 @@ export function AppSidebar({
                     onClick={() => handleServiceClick('coleta-especiais')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'coleta-especiais' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-coleta-especiais"
                   >
@@ -293,8 +294,8 @@ export function AppSidebar({
                     onClick={() => handleServiceClick('limpeza-bocas')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'limpeza-bocas' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-limpeza-bocas"
                   >
@@ -306,8 +307,8 @@ export function AppSidebar({
                     onClick={() => handleServiceClick('pevs')}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors hover-elevate active-elevate-2 ${
                       selectedService === 'pevs' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-accent text-accent-foreground font-medium' 
+                        : 'text-foreground/90 hover:text-foreground'
                     }`}
                     data-testid="service-pevs"
                   >
