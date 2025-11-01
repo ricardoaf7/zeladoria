@@ -23,53 +23,36 @@ export interface IStorage {
   updateConfig(config: Partial<AppConfig>): Promise<AppConfig>;
 }
 
-function addBusinessDays(date: Date, days: number): Date {
-  const result = new Date(date);
-  let addedDays = 0;
+// Função legada de cálculo de agendamento - DEPRECADA
+// Use shared/schedulingAlgorithm.ts para novos cálculos
+async function calculateMowingScheduleWithHolidays(areas: ServiceArea[], config: AppConfig): Promise<void> {
+  const { calculateMowingSchedule } = await import('@shared/schedulingAlgorithm');
   
-  while (addedDays < days) {
-    result.setDate(result.getDate() + 1);
-    const dayOfWeek = result.getDay();
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-      addedDays++;
+  // Calcular para lote 1
+  const lote1Results = calculateMowingSchedule(
+    areas,
+    1,
+    config.mowingProductionRate.lote1,
+    new Date()
+  );
+  
+  // Calcular para lote 2
+  const lote2Results = calculateMowingSchedule(
+    areas,
+    2,
+    config.mowingProductionRate.lote2,
+    new Date()
+  );
+  
+  // Aplicar resultados às áreas
+  const allResults = [...lote1Results, ...lote2Results];
+  for (const result of allResults) {
+    const area = areas.find(a => a.id === result.areaId);
+    if (area) {
+      area.proximaPrevisao = result.proximaPrevisao;
+      area.daysToComplete = result.daysToComplete;
     }
   }
-  
-  return result;
-}
-
-function calculateMowingSchedule(areas: ServiceArea[], config: AppConfig): void {
-  let currentDateLote1 = new Date();
-  let currentDateLote2 = new Date();
-
-  // Pular áreas com agendamento manual (manualSchedule === true)
-  const lote1Areas = areas
-    .filter(a => a.lote === 1 && a.status === "Pendente" && !a.manualSchedule)
-    .sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
-
-  const lote2Areas = areas
-    .filter(a => a.lote === 2 && a.status === "Pendente" && !a.manualSchedule)
-    .sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
-
-  lote1Areas.forEach(area => {
-    area.scheduledDate = currentDateLote1.toISOString();
-    if (area.metragem_m2) {
-      const daysToComplete = Math.ceil(area.metragem_m2 / config.mowingProductionRate.lote1);
-      currentDateLote1 = addBusinessDays(currentDateLote1, daysToComplete);
-    } else {
-      currentDateLote1 = addBusinessDays(currentDateLote1, 1);
-    }
-  });
-
-  lote2Areas.forEach(area => {
-    area.scheduledDate = currentDateLote2.toISOString();
-    if (area.metragem_m2) {
-      const daysToComplete = Math.ceil(area.metragem_m2 / config.mowingProductionRate.lote2);
-      currentDateLote2 = addBusinessDays(currentDateLote2, daysToComplete);
-    } else {
-      currentDateLote2 = addBusinessDays(currentDateLote2, 1);
-    }
-  });
 }
 
 export class MemStorage implements IStorage {
@@ -90,7 +73,9 @@ export class MemStorage implements IStorage {
     this.jardinsAreas = this.initializeJardinsAreas();
     this.teams = this.initializeTeams();
 
-    calculateMowingSchedule(this.rocagemAreas, this.config);
+    // Nota: MemStorage é usado apenas para desenvolvimento
+    // O cálculo automático de previsões agora usa o algoritmo com feriados
+    // via registerDailyMowing() e o novo shared/schedulingAlgorithm.ts
   }
 
   private initializeRocagemAreas(): ServiceArea[] {
@@ -194,9 +179,8 @@ export class MemStorage implements IStorage {
       status: status,
     });
 
-    if (status === "Concluído" && area.lote) {
-      calculateMowingSchedule(this.rocagemAreas, this.config);
-    }
+    // Nota: MemStorage não recalcula automaticamente
+    // Em produção, use DbStorage que tem o algoritmo com feriados
 
     return area;
   }
@@ -258,6 +242,8 @@ export class MemStorage implements IStorage {
       updatedAreas.push(area);
     }
 
+    // Nota: MemStorage não recalcula automaticamente previsões
+    // Em produção, use DbStorage que tem o algoritmo com feriados
     return updatedAreas;
   }
 
@@ -289,7 +275,8 @@ export class MemStorage implements IStorage {
         ...this.config.mowingProductionRate,
         ...newConfig.mowingProductionRate,
       };
-      calculateMowingSchedule(this.rocagemAreas, this.config);
+      // Nota: MemStorage não recalcula automaticamente
+      // Em produção, use DbStorage que tem o algoritmo com feriados
     }
     return this.config;
   }

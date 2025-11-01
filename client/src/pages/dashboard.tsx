@@ -10,6 +10,7 @@ export default function Dashboard() {
   const [selectedArea, setSelectedArea] = useState<ServiceArea | null>(null);
   const [selectedService, setSelectedService] = useState<string>('rocagem');
   const [selectionMode, setSelectionMode] = useState(false);
+  const [isRegistrationMode, setIsRegistrationMode] = useState(false);
   const [selectedAreaIds, setSelectedAreaIds] = useState<Set<number>>(new Set());
   const mapRef = useRef<L.Map | null>(null);
 
@@ -74,6 +75,16 @@ export default function Dashboard() {
       setSelectedAreaIds(new Set());
     }
     setSelectedArea(null);
+    setIsRegistrationMode(false);
+  };
+
+  const handleRegistrationModeChange = (isActive: boolean) => {
+    setIsRegistrationMode(isActive);
+    setSelectionMode(isActive);
+    if (!isActive) {
+      setSelectedAreaIds(new Set());
+    }
+    setSelectedArea(null);
   };
 
   const handleClearSelection = () => {
@@ -91,6 +102,8 @@ export default function Dashboard() {
           onAreaUpdate={handleAreaUpdate}
           selectionMode={selectionMode}
           onToggleSelectionMode={handleToggleSelectionMode}
+          isRegistrationMode={isRegistrationMode}
+          onRegistrationModeChange={handleRegistrationModeChange}
           selectedAreaIds={selectedAreaIds}
           onClearSelection={handleClearSelection}
           rocagemAreas={rocagemAreas}

@@ -28,8 +28,9 @@ export function AreaInfoCard({ area, onClose, onUpdate }: AreaInfoCardProps) {
   });
 
   const updateAreaMutation = useMutation({
-    mutationFn: async (data: Partial<ServiceArea>) => {
-      return await apiRequest("PATCH", `/api/areas/${area.id}`, data);
+    mutationFn: async (data: Partial<ServiceArea>): Promise<ServiceArea> => {
+      const res = await apiRequest("PATCH", `/api/areas/${area.id}`, data);
+      return await res.json() as ServiceArea;
     },
     onSuccess: (updatedArea: ServiceArea) => {
       queryClient.invalidateQueries({ queryKey: ["/api/areas/rocagem"] });
@@ -180,6 +181,18 @@ export function AreaInfoCard({ area, onClose, onUpdate }: AreaInfoCardProps) {
                 <p className="text-xs text-muted-foreground">Próxima Previsão</p>
                 <p className="text-sm font-medium" data-testid="text-proxima-previsao">
                   {new Date(area.proximaPrevisao).toLocaleDateString('pt-BR')}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {area.ultimaRocagem && (
+            <div className="flex items-start gap-3">
+              <Calendar className="h-4 w-4 text-emerald-500 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground">Última Roçagem</p>
+                <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400" data-testid="text-ultima-rocagem">
+                  {new Date(area.ultimaRocagem).toLocaleDateString('pt-BR')}
                 </p>
               </div>
             </div>

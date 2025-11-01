@@ -29,6 +29,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { AreaInfoCard } from "./AreaInfoCard";
 import { BatchSchedulePanel } from "./BatchSchedulePanel";
+import { DailyRegistrationPanel } from "./DailyRegistrationPanel";
 import { Separator } from "@/components/ui/separator";
 import type { ServiceArea } from "@shared/schema";
 
@@ -40,6 +41,8 @@ interface AppSidebarProps {
   onAreaUpdate?: (area: ServiceArea) => void;
   selectionMode?: boolean;
   onToggleSelectionMode?: () => void;
+  isRegistrationMode?: boolean;
+  onRegistrationModeChange?: (isActive: boolean) => void;
   selectedAreaIds?: Set<number>;
   onClearSelection?: () => void;
   rocagemAreas?: ServiceArea[];
@@ -53,6 +56,8 @@ export function AppSidebar({
   onAreaUpdate,
   selectionMode = false,
   onToggleSelectionMode,
+  isRegistrationMode = false,
+  onRegistrationModeChange,
   selectedAreaIds = new Set(),
   onClearSelection,
   rocagemAreas = [],
@@ -78,14 +83,25 @@ export function AppSidebar({
       </SidebarHeader>
 
       <SidebarContent className="px-4">
-        {selectionMode ? (
+        {selectedService === 'rocagem' && onRegistrationModeChange && (
+          <div className="mb-4">
+            <DailyRegistrationPanel
+              selectedAreas={Array.from(selectedAreaIds)}
+              onModeChange={onRegistrationModeChange}
+              onClearSelection={onClearSelection!}
+            />
+            <Separator className="my-4" />
+          </div>
+        )}
+        
+        {selectionMode && !isRegistrationMode ? (
           <BatchSchedulePanel
             selectedCount={selectedAreaIds.size}
             selectedAreaIds={selectedAreaIds}
             onToggleSelectionMode={onToggleSelectionMode!}
             onClearSelection={onClearSelection!}
           />
-        ) : selectedArea && onAreaClose ? (
+        ) : selectedArea && onAreaClose && !isRegistrationMode ? (
           <div className="mb-4">
             <AreaInfoCard 
               area={selectedArea} 
@@ -102,7 +118,7 @@ export function AppSidebar({
               <Layers className="h-4 w-4" />
               <span>Serviços</span>
             </div>
-            {selectedService === 'rocagem' && onToggleSelectionMode && (
+            {selectedService === 'rocagem' && onToggleSelectionMode && !isRegistrationMode && (
               <Button
                 variant={selectionMode ? "default" : "outline"}
                 size="sm"

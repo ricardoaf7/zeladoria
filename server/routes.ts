@@ -44,13 +44,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const configSchema = z.object({
         mowingProductionRate: z.object({
-          lote1: z.number().optional(),
-          lote2: z.number().optional(),
-        }).optional(),
+          lote1: z.number(),
+          lote2: z.number(),
+        }).partial().optional(),
       });
 
       const validatedConfig = configSchema.parse(req.body);
-      const updatedConfig = await storage.updateConfig(validatedConfig);
+      const updatedConfig = await storage.updateConfig(validatedConfig as any);
       res.json(updatedConfig);
     } catch (error) {
       if (error instanceof z.ZodError) {
