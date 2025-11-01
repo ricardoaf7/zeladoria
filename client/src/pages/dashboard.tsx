@@ -173,7 +173,7 @@ export default function Dashboard() {
                 teamsGiroZero: true,
                 teamsAcabamento: true,
                 teamsColeta: true,
-                teamsTouceiras: true,
+                teamsCapina: true,
               }}
               onAreaClick={handleAreaClick}
               filteredAreaIds={hasActiveFilters ? new Set(filteredRocagemAreas.map(a => a.id)) : undefined}

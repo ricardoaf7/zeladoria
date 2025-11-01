@@ -147,7 +147,7 @@ export class MemStorage implements IStorage {
       { id: 1, service: "rocagem", type: "Giro Zero", lote: 1, status: "Working", currentAreaId: 5, location: { lat: -23.3099, lng: -51.1603 } },
       { id: 2, service: "rocagem", type: "Acabamento", lote: 1, status: "Idle", currentAreaId: null, location: { lat: -23.30, lng: -51.15 } },
       { id: 3, service: "rocagem", type: "Coleta", lote: 1, status: "Idle", currentAreaId: null, location: { lat: -23.30, lng: -51.15 } },
-      { id: 4, service: "rocagem", type: "Touceiras", lote: 1, status: "Idle", currentAreaId: null, location: { lat: -23.30, lng: -51.15 } },
+      { id: 4, service: "rocagem", type: "Capina", lote: 1, status: "Idle", currentAreaId: null, location: { lat: -23.30, lng: -51.15 } },
       { id: 5, service: "rocagem", type: "Giro Zero", lote: 2, status: "Working", currentAreaId: 106, location: { lat: -23.2989, lng: -51.1823 } },
       { id: 6, service: "rocagem", type: "Acabamento", lote: 2, status: "Idle", currentAreaId: null, location: { lat: -23.31, lng: -51.16 } },
       { id: 7, service: "jardins", type: "Manutenção", lote: null, status: "Idle", currentAreaId: null, location: { lat: -23.32, lng: -51.17 } },

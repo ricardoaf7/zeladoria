@@ -85,11 +85,11 @@ export function MapLegend() {
           <div className="flex items-center gap-2 text-xs">
             <div 
               className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white border border-white shadow-sm" 
-              style={{backgroundColor: "hsl(var(--team-touceiras))"}}
+              style={{backgroundColor: "hsl(var(--team-capina))"}}
             >
-              TC
+              CP
             </div>
-            <span>Touceiras</span>
+            <span>Capina</span>
           </div>
         </div>
       </CardContent>

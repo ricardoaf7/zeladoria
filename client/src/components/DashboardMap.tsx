@@ -20,7 +20,7 @@ interface DashboardMapProps {
     teamsGiroZero: boolean;
     teamsAcabamento: boolean;
     teamsColeta: boolean;
-    teamsTouceiras: boolean;
+    teamsCapina: boolean;
   };
   onAreaClick: (area: ServiceArea) => void;
   mapRef?: React.MutableRefObject<L.Map | null>;
@@ -142,7 +142,7 @@ export function DashboardMap({
       teamsGiroZero: L.layerGroup().addTo(map),
       teamsAcabamento: L.layerGroup().addTo(map),
       teamsColeta: L.layerGroup().addTo(map),
-      teamsTouceiras: L.layerGroup().addTo(map),
+      teamsCapina: L.layerGroup().addTo(map),
     };
 
     mapRef.current = map;
@@ -333,8 +333,8 @@ export function DashboardMap({
         layerGroup = layerGroupsRef.current.teamsColeta;
         teamColor = "hsl(var(--team-coleta))";
         teamLabel = "CO";
-      } else if (team.type === "Touceiras" || team.type === "Capina") {
-        layerGroup = layerGroupsRef.current.teamsTouceiras;
+      } else if (team.type === "Capina") {
+        layerGroup = layerGroupsRef.current.teamsCapina;
         teamColor = "hsl(var(--team-capina))";
         teamLabel = team.type === "Capina" ? "CP" : "TC";
       } else {
@@ -379,15 +379,6 @@ export function DashboardMap({
       marker.addTo(layerGroup);
     });
 
-    if (layerGroupsRef.current.rocagemLote1 && typeof layerGroupsRef.current.rocagemLote1.bringToFront === 'function') {
-      layerGroupsRef.current.rocagemLote1.bringToFront();
-    }
-    if (layerGroupsRef.current.rocagemLote2 && typeof layerGroupsRef.current.rocagemLote2.bringToFront === 'function') {
-      layerGroupsRef.current.rocagemLote2.bringToFront();
-    }
-    if (layerGroupsRef.current.jardins && typeof layerGroupsRef.current.jardins.bringToFront === 'function') {
-      layerGroupsRef.current.jardins.bringToFront();
-    }
   }, [teams]);
 
   return (
