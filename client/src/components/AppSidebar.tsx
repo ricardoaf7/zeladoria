@@ -33,6 +33,7 @@ import { AreaInfoCard } from "./AreaInfoCard";
 import { BatchSchedulePanel } from "./BatchSchedulePanel";
 import { DailyRegistrationPanel } from "./DailyRegistrationPanel";
 import { FilterPanel, type FilterCriteria } from "./FilterPanel";
+import { MapLegend } from "./MapLegend";
 import { Separator } from "@/components/ui/separator";
 import type { ServiceArea } from "@shared/schema";
 
@@ -110,6 +111,13 @@ export function AppSidebar({
               onModeChange={onRegistrationModeChange}
               onClearSelection={onClearSelection!}
             />
+            <Separator className="my-4" />
+          </div>
+        )}
+
+        {selectedService === 'rocagem' && (
+          <div className="mb-4">
+            <MapLegend />
             <Separator className="my-4" />
           </div>
         )}
