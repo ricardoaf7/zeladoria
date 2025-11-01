@@ -89,7 +89,7 @@ export default function Dashboard() {
   }, [selectedArea]);
 
   const style = {
-    "--sidebar-width": "28rem",
+    "--sidebar-width": "21rem",
     "--sidebar-width-icon": "4rem",
   };
 

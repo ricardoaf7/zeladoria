@@ -83,18 +83,18 @@ export function AppSidebar({
 
   return (
     <Sidebar className="border-r-0">
-      <SidebarHeader className="p-6 pb-4">
-        <div className="flex flex-col gap-2">
+      <SidebarHeader className="p-4 pb-3">
+        <div className="flex flex-col gap-1.5">
           <img 
             src={theme === 'dark' ? operacoesLogoNegativo : operacoesLogoPositivo} 
             alt="Diretoria de Operações"
-            className="h-16 w-auto object-contain"
+            className="h-14 w-auto object-contain"
           />
-          <p className="text-xs text-muted-foreground text-center">Operações em Tempo Real</p>
+          <p className="text-xs text-muted-foreground text-center leading-tight">Zeladoria em Tempo Real</p>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-4">
+      <SidebarContent className="px-3">
         {selectedArea && onAreaClose && !isRegistrationMode ? (
           <div className="mb-4">
             <AreaInfoCard 
