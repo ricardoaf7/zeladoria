@@ -189,12 +189,19 @@ export class DbStorage implements IStorage {
       return defaultConfig;
     }
     
-    return results[0].mowingProductionRate as AppConfig;
+    return {
+      mowingProductionRate: results[0].mowingProductionRate as { lote1: number; lote2: number }
+    };
   }
 
   async updateConfig(config: Partial<AppConfig>): Promise<AppConfig> {
     const current = await this.getConfig();
-    const updated = { ...current, ...config };
+    const updated = {
+      mowingProductionRate: {
+        ...current.mowingProductionRate,
+        ...(config.mowingProductionRate || {})
+      }
+    };
     
     await this.db
       .update(appConfig)
