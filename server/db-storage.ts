@@ -103,7 +103,7 @@ export class DbStorage implements IStorage {
 
   async addHistoryEntry(
     areaId: number, 
-    entry: { date: string; status: string; observation?: string }
+    entry: { date: string; status: string; type?: 'completed' | 'forecast'; observation?: string }
   ): Promise<ServiceArea | undefined> {
     const area = await this.getAreaById(areaId);
     if (!area) return undefined;
@@ -118,25 +118,6 @@ export class DbStorage implements IStorage {
     
     if (results.length === 0) return undefined;
     return this.mapDbAreaToServiceArea(results[0]);
-  }
-
-  async batchScheduleAreas(
-    areaIds: number[], 
-    scheduledDate: string, 
-    daysToComplete?: number
-  ): Promise<ServiceArea[]> {
-    const results = await this.db
-      .update(serviceAreas)
-      .set({ 
-        scheduledDate, 
-        daysToComplete,
-        manualSchedule: true,
-        updatedAt: new Date()
-      })
-      .where(inArray(serviceAreas.id, areaIds))
-      .returning();
-    
-    return results.map(this.mapDbAreaToServiceArea);
   }
 
   async getAllTeams(): Promise<Team[]> {

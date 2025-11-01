@@ -10,7 +10,6 @@ export interface IStorage {
   updateAreaPosition(id: number, lat: number, lng: number): Promise<ServiceArea | undefined>;
   updateArea(id: number, data: Partial<ServiceArea>): Promise<ServiceArea | undefined>;
   addHistoryEntry(areaId: number, entry: { date: string; status: string; type?: 'completed' | 'forecast'; observation?: string }): Promise<ServiceArea | undefined>;
-  batchScheduleAreas(areaIds: number[], scheduledDate: string, daysToComplete?: number): Promise<ServiceArea[]>;
   registerDailyMowing(areaIds: number[], date: string, type: 'completed' | 'forecast'): Promise<void>;
   
   // Teams
@@ -218,33 +217,12 @@ export class MemStorage implements IStorage {
     return area;
   }
 
-  async addHistoryEntry(areaId: number, entry: { date: string; status: string; observation?: string }): Promise<ServiceArea | undefined> {
+  async addHistoryEntry(areaId: number, entry: { date: string; status: string; type?: 'completed' | 'forecast'; observation?: string }): Promise<ServiceArea | undefined> {
     const area = await this.getAreaById(areaId);
     if (!area) return undefined;
 
     area.history.push(entry);
     return area;
-  }
-
-  async batchScheduleAreas(areaIds: number[], scheduledDate: string, daysToComplete?: number): Promise<ServiceArea[]> {
-    const updatedAreas: ServiceArea[] = [];
-
-    for (const areaId of areaIds) {
-      const area = await this.getAreaById(areaId);
-      if (!area) continue;
-
-      area.scheduledDate = scheduledDate;
-      area.manualSchedule = true;
-      if (daysToComplete !== undefined) {
-        area.daysToComplete = daysToComplete;
-      }
-
-      updatedAreas.push(area);
-    }
-
-    // Nota: MemStorage não recalcula automaticamente previsões
-    // Em produção, use DbStorage que tem o algoritmo com feriados
-    return updatedAreas;
   }
 
   async getAllTeams(): Promise<Team[]> {

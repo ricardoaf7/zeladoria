@@ -30,7 +30,6 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { AreaInfoCard } from "./AreaInfoCard";
-import { BatchSchedulePanel } from "./BatchSchedulePanel";
 import { DailyRegistrationPanel } from "./DailyRegistrationPanel";
 import { FilterPanel, type FilterCriteria } from "./FilterPanel";
 import { MapLegend } from "./MapLegend";
@@ -122,14 +121,7 @@ export function AppSidebar({
           </div>
         )}
         
-        {selectionMode && !isRegistrationMode ? (
-          <BatchSchedulePanel
-            selectedCount={selectedAreaIds.size}
-            selectedAreaIds={selectedAreaIds}
-            onToggleSelectionMode={onToggleSelectionMode!}
-            onClearSelection={onClearSelection!}
-          />
-        ) : selectedArea && onAreaClose && !isRegistrationMode ? (
+        {selectedArea && onAreaClose && !isRegistrationMode ? (
           <div className="mb-4">
             <AreaInfoCard 
               area={selectedArea} 

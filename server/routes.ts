@@ -220,27 +220,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/areas/batch-schedule", async (req, res) => {
-    try {
-      const batchScheduleSchema = z.object({
-        areaIds: z.array(z.number()),
-        scheduledDate: z.string(),
-        daysToComplete: z.number().optional(),
-      });
-
-      const { areaIds, scheduledDate, daysToComplete } = batchScheduleSchema.parse(req.body);
-      const updatedAreas = await storage.batchScheduleAreas(areaIds, scheduledDate, daysToComplete);
-
-      res.json(updatedAreas);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid batch schedule data", details: error.errors });
-      } else {
-        res.status(500).json({ error: "Failed to batch schedule areas" });
-      }
-    }
-  });
-
   app.post("/api/areas/register-daily", async (req, res) => {
     try {
       const registerSchema = z.object({
