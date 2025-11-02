@@ -404,41 +404,44 @@ export function DashboardMap({
 
 function getAreaColor(area: ServiceArea, today: Date, isSelected = false): string {
   if (isSelected) {
-    return "#9333ea";
+    return "#9333ea"; // Roxo para selecionado
   }
 
   if (area.status === "Em Execução") {
-    return "#10b981";
+    return "#10b981"; // Verde forte para em execução
   }
 
-  if (area.scheduledDate) {
-    const scheduled = new Date(area.scheduledDate);
-    scheduled.setHours(0, 0, 0, 0);
-
-    if (scheduled.getTime() === today.getTime()) {
-      return "#fbbf24";
-    }
-
-    const diffDays = Math.ceil((scheduled.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (diffDays > 0 && diffDays <= 3) {
-      return "#fde68a";
-    }
-
-    if (diffDays > 3 && diffDays <= 7) {
-      return "#93c5fd";
-    }
-  }
-
-  if (area.status === "Concluído" && area.history.length > 0) {
+  // Sistema de cores baseado em ciclo de 45 dias
+  // Quanto mais próximo da execução, mais forte a cor verde
+  if (area.history.length > 0) {
     const lastHistory = area.history[area.history.length - 1];
     const lastDate = new Date(lastHistory.date);
-    const diffDays = Math.ceil((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+    lastDate.setHours(0, 0, 0, 0);
+    
+    const daysSinceLastMowing = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diffDays <= 7) {
-      return "#059669";
+    // 5 escalas de cor baseadas no ciclo de 45 dias
+    if (daysSinceLastMowing >= 0 && daysSinceLastMowing <= 5) {
+      // Recém roçado (0-5 dias) - Verde muito claro
+      return "#d1fae5";
+    } else if (daysSinceLastMowing > 5 && daysSinceLastMowing <= 15) {
+      // Roçado recentemente (5-15 dias) - Verde claro
+      return "#a7f3d0";
+    } else if (daysSinceLastMowing > 15 && daysSinceLastMowing <= 25) {
+      // Meio do ciclo (15-25 dias) - Verde médio
+      return "#6ee7b7";
+    } else if (daysSinceLastMowing > 25 && daysSinceLastMowing <= 35) {
+      // Próximo da roçagem (25-35 dias) - Verde mais forte
+      return "#34d399";
+    } else if (daysSinceLastMowing > 35 && daysSinceLastMowing <= 44) {
+      // Muito próximo da roçagem (35-44 dias) - Verde forte
+      return "#10b981";
+    } else if (daysSinceLastMowing > 44) {
+      // Atrasado (>45 dias) - Amarelo/alerta
+      return "#fbbf24";
     }
   }
 
+  // Sem histórico - cinza
   return "#9ca3af";
 }
