@@ -330,49 +330,64 @@ export function DashboardMap({
       let layerGroup: L.LayerGroup | undefined;
       let teamColor: string;
       let teamLabel: string;
+      let borderColor: string;
+      let borderWidth: number;
 
       if (team.type === "Giro Zero") {
         layerGroup = layerGroupsRef.current.teamsGiroZero;
-        teamColor = "hsl(var(--team-giro-zero))";
+        teamColor = "#3b82f6"; // Azul
         teamLabel = "GZ";
+        borderColor = "#1e40af";
+        borderWidth = team.status === "Working" ? 3 : 2;
       } else if (team.type === "Acabamento") {
         layerGroup = layerGroupsRef.current.teamsAcabamento;
-        teamColor = "hsl(var(--team-acabamento))";
+        teamColor = "#8b5cf6"; // Roxo
         teamLabel = "AC";
+        borderColor = "#6d28d9";
+        borderWidth = team.status === "Working" ? 3 : 2;
       } else if (team.type === "Coleta") {
         layerGroup = layerGroupsRef.current.teamsColeta;
-        teamColor = "hsl(var(--team-coleta))";
+        teamColor = "#f59e0b"; // Laranja
         teamLabel = "CO";
+        borderColor = "#d97706";
+        borderWidth = team.status === "Working" ? 3 : 2;
       } else if (team.type === "Capina") {
         layerGroup = layerGroupsRef.current.teamsCapina;
-        teamColor = "hsl(var(--team-capina))";
-        teamLabel = team.type === "Capina" ? "CP" : "TC";
+        teamColor = "#10b981"; // Verde
+        teamLabel = "CP";
+        borderColor = "#059669";
+        borderWidth = team.status === "Working" ? 3 : 2;
       } else {
         return;
       }
 
       if (!layerGroup) return;
 
-      const opacity = team.status === "Idle" ? 0.5 : 1;
+      const opacity = team.status === "Idle" ? 0.6 : 1;
+      const pulseAnimation = team.status === "Working" 
+        ? "animation: pulse 2s infinite;" 
+        : "";
+      
       const icon = L.divIcon({
         className: `team-marker-${team.type.toLowerCase().replace(/\s/g, "-")}`,
         html: `<div style="
           background-color: ${teamColor};
           color: white;
-          width: 28px;
-          height: 28px;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 11px;
+          font-size: 12px;
           font-weight: bold;
-          border: 2px solid white;
-          box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+          border: ${borderWidth}px solid ${borderColor};
+          box-shadow: 0 4px 10px rgba(0,0,0,0.6);
           opacity: ${opacity};
+          ${pulseAnimation}
         ">${teamLabel}</div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
       });
 
       const marker = L.marker([team.location.lat, team.location.lng], { icon });
