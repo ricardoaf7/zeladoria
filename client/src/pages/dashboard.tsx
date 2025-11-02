@@ -8,6 +8,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
 import type { ServiceArea, Team, AppConfig } from "@shared/schema";
 import type { FilterCriteria } from "@/components/FilterPanel";
+import type { TimeRangeFilter } from "@/components/MapLegend";
 import L from "leaflet";
 
 export default function Dashboard() {
@@ -25,6 +26,8 @@ export default function Dashboard() {
     status: "all",
     tipo: "all",
   });
+  const [timeRangeFilter, setTimeRangeFilter] = useState<TimeRangeFilter>(null);
+  const [customFilterDate, setCustomFilterDate] = useState<Date | undefined>();
   const mapRef = useRef<L.Map | null>(null);
 
   const handleServiceSelect = (service: string) => {
@@ -50,17 +53,69 @@ export default function Dashboard() {
     queryKey: ["/api/config"],
   });
 
-  // Filtrar áreas baseado nos critérios
+  // Função auxiliar para calcular dias desde última roçagem
+  const getDaysSinceLastMowing = (area: ServiceArea): number => {
+    if (area.history.length === 0) return -1;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const lastHistory = area.history[area.history.length - 1];
+    const lastDate = new Date(lastHistory.date);
+    lastDate.setHours(0, 0, 0, 0);
+    
+    return Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
+  // Filtrar áreas baseado nos critérios (incluindo filtro de tempo)
   const filteredRocagemAreas = useMemo(() => {
+    let areas = rocagemAreas;
+
+    // Aplicar filtro de tempo primeiro
+    if (timeRangeFilter) {
+      areas = areas.filter(area => {
+        const days = getDaysSinceLastMowing(area);
+        
+        // Se não tem histórico, não mostra em nenhum filtro de tempo
+        if (days === -1) return false;
+
+        switch (timeRangeFilter) {
+          case '0-5':
+            return days >= 0 && days <= 5;
+          case '5-15':
+            return days > 5 && days <= 15;
+          case '15-25':
+            return days > 15 && days <= 25;
+          case '25-35':
+            return days > 25 && days <= 35;
+          case '35-44':
+            return days > 35 && days <= 44;
+          case '45+':
+            return days > 44;
+          case 'custom':
+            if (!customFilterDate) return false;
+            const filterDate = new Date(customFilterDate);
+            filterDate.setHours(0, 0, 0, 0);
+            const lastHistory = area.history[area.history.length - 1];
+            const lastDate = new Date(lastHistory.date);
+            lastDate.setHours(0, 0, 0, 0);
+            return lastDate.getTime() === filterDate.getTime();
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Aplicar filtros tradicionais
     if (!filters.search && 
         (!filters.bairro || filters.bairro === "all") && 
         (!filters.lote || filters.lote === "all") && 
         (!filters.status || filters.status === "all") && 
         (!filters.tipo || filters.tipo === "all")) {
-      return rocagemAreas;
+      return areas;
     }
 
-    return rocagemAreas.filter(area => {
+    return areas.filter(area => {
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         const endereco = area.endereco?.toLowerCase() || "";
@@ -77,13 +132,14 @@ export default function Dashboard() {
 
       return true;
     });
-  }, [rocagemAreas, filters]);
+  }, [rocagemAreas, filters, timeRangeFilter, customFilterDate]);
 
   const hasActiveFilters = filters.search || 
     (filters.bairro && filters.bairro !== "all") || 
     (filters.lote && filters.lote !== "all") || 
     (filters.status && filters.status !== "all") || 
-    (filters.tipo && filters.tipo !== "all");
+    (filters.tipo && filters.tipo !== "all") ||
+    timeRangeFilter !== null;
 
   useEffect(() => {
     if (selectedArea && mapRef.current) {
@@ -147,6 +203,12 @@ export default function Dashboard() {
     setSelectedAreaIds(new Set());
   };
 
+  const handleTimeRangeFilterChange = (filter: TimeRangeFilter, customDate?: Date) => {
+    setTimeRangeFilter(filter);
+    // Sempre atualizar customFilterDate (undefined para filtros não-custom)
+    setCustomFilterDate(customDate);
+  };
+
   // Mobile layout com BottomSheet
   if (isMobile) {
     return (
@@ -198,6 +260,7 @@ export default function Dashboard() {
               filters={filters}
               onFilterChange={setFilters}
               filteredCount={filteredRocagemAreas.length}
+              onTimeRangeFilterChange={handleTimeRangeFilterChange}
             />
           </BottomSheet>
         </main>
@@ -228,6 +291,7 @@ export default function Dashboard() {
           filters={filters}
           onFilterChange={setFilters}
           filteredCount={filteredRocagemAreas.length}
+          onTimeRangeFilterChange={handleTimeRangeFilterChange}
         />
         
         <SidebarInset className="flex-1 overflow-hidden">

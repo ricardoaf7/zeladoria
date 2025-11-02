@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { 
   MapPin, 
   Layers, 
@@ -34,7 +35,7 @@ import { Button } from "@/components/ui/button";
 import { AreaInfoCard } from "./AreaInfoCard";
 import { DailyRegistrationPanel } from "./DailyRegistrationPanel";
 import { FilterPanel, type FilterCriteria } from "./FilterPanel";
-import { MapLegend } from "./MapLegend";
+import { MapLegend, type TimeRangeFilter } from "./MapLegend";
 import { Separator } from "@/components/ui/separator";
 import type { ServiceArea } from "@shared/schema";
 
@@ -55,6 +56,7 @@ interface AppSidebarProps {
   onFilterChange?: (filters: FilterCriteria) => void;
   filteredCount?: number;
   standalone?: boolean;
+  onTimeRangeFilterChange?: (filter: TimeRangeFilter, customDate?: Date) => void;
 }
 
 export function AppSidebar({
@@ -74,8 +76,11 @@ export function AppSidebar({
   onFilterChange,
   filteredCount = 0,
   standalone = false,
+  onTimeRangeFilterChange,
 }: AppSidebarProps) {
   const { theme } = useTheme();
+  const [activeTimeFilter, setActiveTimeFilter] = useState<TimeRangeFilter>(null);
+  const [customDate, setCustomDate] = useState<Date | undefined>();
   
   const handleServiceClick = (service: string) => {
     if (onServiceSelect) {
@@ -85,6 +90,25 @@ export function AppSidebar({
       } else {
         onServiceSelect(service);
       }
+    }
+  };
+
+  const handleTimeFilterChange = (filter: TimeRangeFilter) => {
+    setActiveTimeFilter(filter);
+    if (onTimeRangeFilterChange) {
+      // Para filtros não-custom, passar undefined como data
+      // Para filtro custom, passar a data armazenada
+      const dateToPass = filter === 'custom' ? customDate : undefined;
+      onTimeRangeFilterChange(filter, dateToPass);
+    }
+  };
+
+  const handleCustomDateChange = (date: Date | undefined) => {
+    setCustomDate(date);
+    // Quando uma data é selecionada, ativar o filtro 'custom' automaticamente com a data
+    if (onTimeRangeFilterChange && date) {
+      setActiveTimeFilter('custom');
+      onTimeRangeFilterChange('custom', date);
     }
   };
 
@@ -196,7 +220,12 @@ export function AppSidebar({
                             </>
                           )}
 
-                          <MapLegend />
+                          <MapLegend 
+                            activeFilter={activeTimeFilter}
+                            onFilterChange={handleTimeFilterChange}
+                            customDate={customDate}
+                            onCustomDateChange={handleCustomDateChange}
+                          />
                           <Separator className="my-3" />
                         </div>
                       </motion.div>

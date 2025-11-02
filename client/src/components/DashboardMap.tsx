@@ -189,20 +189,19 @@ export function DashboardMap({
       const color = getAreaColor(area, today, isSelected);
       const isPulsing = area.status === "Em Execução";
 
-      if (area.polygon && area.polygon.length > 0) {
-        const polygon = L.polygon(
-          area.polygon.map((p) => [p.lat, p.lng]),
-          {
-            color: color,
-            fillColor: color,
-            fillOpacity: isFiltered ? 0.4 : 0.08,
-            weight: 2,
-            opacity: opacity,
-            className: isPulsing ? "animate-pulse" : "",
-          }
-        );
+      // Usar círculo para todas as áreas
+      {
+        const circle = L.circleMarker([area.lat, area.lng], {
+          radius: 8,
+          color: color,
+          fillColor: color,
+          fillOpacity: isFiltered ? 0.6 : 0.2,
+          weight: 2,
+          opacity: opacity,
+          className: isPulsing ? "animate-pulse" : "",
+        });
 
-        polygon.bindTooltip(
+        circle.bindTooltip(
           `<div class="font-sans text-xs">
             <strong>${area.endereco}</strong><br/>
             Roçagem de Áreas Públicas<br/>
@@ -214,7 +213,7 @@ export function DashboardMap({
           }
         );
 
-        polygon.bindPopup(
+        circle.bindPopup(
           `<div class="font-sans">
             <strong>${area.endereco}</strong><br/>
             Status: ${area.status}<br/>
@@ -223,64 +222,8 @@ export function DashboardMap({
           </div>`
         );
 
-        polygon.on("click", () => onAreaClick(area));
-        polygon.addTo(layerGroup);
-      } else {
-        const icon = L.divIcon({
-          className: `custom-marker ${isPulsing ? "animate-pulse" : ""}`,
-          html: `<div data-testid="area-marker-${area.id}" data-area-id="${area.id}" style="
-            background: ${isSelected ? 'rgba(147, 51, 234, 0.3)' : 'rgba(52, 211, 153, 0.25)'};
-            width: 16px; 
-            height: 16px; 
-            border-radius: 50%; 
-            border: 3px solid ${isSelected ? '#9333ea' : '#047857'};
-            box-shadow: 0 2px 6px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.5);
-            cursor: ${selectionMode ? 'pointer' : 'move'}; 
-            opacity: ${opacity};
-            transition: all 0.2s ease;
-          "></div>`,
-          iconSize: [16, 16],
-          iconAnchor: [8, 8],
-        });
-
-        const marker = L.marker([area.lat, area.lng], { 
-          icon,
-          draggable: true,
-        });
-
-        marker.bindTooltip(
-          `<div class="font-sans text-xs">
-            <strong>${area.endereco}</strong><br/>
-            Roçagem de Áreas Públicas<br/>
-            ${area.scheduledDate ? `Previsão: ${new Date(area.scheduledDate).toLocaleDateString('pt-BR')}` : 'Sem previsão'}
-          </div>`,
-          {
-            offset: [0, -5],
-            opacity: 0.9,
-          }
-        );
-
-        marker.bindPopup(
-          `<div class="font-sans">
-            <strong>${area.endereco}</strong><br/>
-            Status: ${area.status}<br/>
-            ${area.metragem_m2 ? `Metragem: ${area.metragem_m2.toLocaleString('pt-BR')} m²<br/>` : ''}
-            ${area.scheduledDate ? `Agendado: ${new Date(area.scheduledDate).toLocaleDateString('pt-BR')}` : ''}
-          </div>`
-        );
-
-        marker.on("click", () => onAreaClick(area));
-        
-        marker.on("dragend", (e: any) => {
-          const newLatLng = e.target.getLatLng();
-          updatePositionMutation.mutate({
-            areaId: area.id,
-            lat: newLatLng.lat,
-            lng: newLatLng.lng,
-          });
-        });
-
-        marker.addTo(layerGroup);
+        circle.on("click", () => onAreaClick(area));
+        circle.addTo(layerGroup);
       }
     });
   }, [rocagemAreas, onAreaClick, selectedAreaIds, filteredAreaIds]);
@@ -452,8 +395,8 @@ function getAreaColor(area: ServiceArea, today: Date, isSelected = false): strin
       // Muito próximo da roçagem (35-44 dias) - Verde forte
       return "#10b981";
     } else if (daysSinceLastMowing > 44) {
-      // Atrasado (>45 dias) - Amarelo/alerta
-      return "#fbbf24";
+      // Atrasado (>45 dias) - Vermelho/alerta
+      return "#ef4444";
     }
   }
 
