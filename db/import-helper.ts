@@ -3,6 +3,7 @@ import { Pool, neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 import { serviceAreas, teams, appConfig } from "./schema";
 import * as fs from "fs";
+import * as path from "path";
 
 neonConfig.webSocketConstructor = ws;
 
@@ -53,7 +54,7 @@ export async function importRealData(csvContent?: string) {
     if (csvContent) {
       content = csvContent;
     } else {
-      const projectCsvPath = "/home/runner/workspace/server/data/areas_londrina.csv";
+      const projectCsvPath = path.join(process.cwd(), "server", "data", "areas_londrina.csv");
       const tmpCsvPath = "/tmp/areas_londrina.csv";
       
       let csvPath: string;
@@ -62,7 +63,7 @@ export async function importRealData(csvContent?: string) {
       } else if (fs.existsSync(tmpCsvPath)) {
         csvPath = tmpCsvPath;
       } else {
-        throw new Error("Arquivo CSV não encontrado");
+        throw new Error("Arquivo CSV não encontrado. Tentou: " + projectCsvPath + " e " + tmpCsvPath);
       }
       
       content = fs.readFileSync(csvPath, 'utf-8');
