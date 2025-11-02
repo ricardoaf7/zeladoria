@@ -3,17 +3,21 @@ import { DashboardMap } from "@/components/DashboardMap";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
+import { BottomSheet, type BottomSheetState } from "@/components/BottomSheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
 import type { ServiceArea, Team, AppConfig } from "@shared/schema";
 import type { FilterCriteria } from "@/components/FilterPanel";
 import L from "leaflet";
 
 export default function Dashboard() {
+  const isMobile = useIsMobile();
   const [selectedArea, setSelectedArea] = useState<ServiceArea | null>(null);
   const [selectedService, setSelectedService] = useState<string>('rocagem');
   const [selectionMode, setSelectionMode] = useState(false);
   const [isRegistrationMode, setIsRegistrationMode] = useState(false);
   const [selectedAreaIds, setSelectedAreaIds] = useState<Set<number>>(new Set());
+  const [bottomSheetState, setBottomSheetState] = useState<BottomSheetState>("minimized");
   const [filters, setFilters] = useState<FilterCriteria>({
     search: "",
     bairro: "all",
@@ -136,6 +140,65 @@ export default function Dashboard() {
     setSelectedAreaIds(new Set());
   };
 
+  // Mobile layout com BottomSheet
+  if (isMobile) {
+    return (
+      <div className="flex flex-col h-screen w-full">
+        <header className="flex items-center justify-between h-14 px-4 border-b border-sidebar-border bg-background z-30">
+          <h1 className="text-lg font-semibold">Zeladoria LD</h1>
+          <ThemeToggle />
+        </header>
+        
+        <main className="flex-1 overflow-hidden relative">
+          <DashboardMap
+            rocagemAreas={rocagemAreas}
+            jardinsAreas={jardinsAreas}
+            teams={teams}
+            layerFilters={{
+              rocagemLote1: selectedService === 'rocagem',
+              rocagemLote2: selectedService === 'rocagem',
+              jardins: selectedService === 'jardins',
+              teamsGiroZero: true,
+              teamsAcabamento: true,
+              teamsColeta: true,
+              teamsCapina: true,
+            }}
+            onAreaClick={handleAreaClick}
+            filteredAreaIds={hasActiveFilters ? new Set(filteredRocagemAreas.map(a => a.id)) : undefined}
+            mapRef={mapRef}
+            selectionMode={selectionMode}
+            selectedAreaIds={selectedAreaIds}
+          />
+          
+          <BottomSheet 
+            state={bottomSheetState}
+            onStateChange={setBottomSheetState}
+          >
+            <AppSidebar
+              standalone
+              selectedService={selectedService}
+              onServiceSelect={setSelectedService}
+              selectedArea={selectedArea}
+              onAreaClose={() => setSelectedArea(null)}
+              onAreaUpdate={handleAreaUpdate}
+              selectionMode={selectionMode}
+              onToggleSelectionMode={handleToggleSelectionMode}
+              isRegistrationMode={isRegistrationMode}
+              onRegistrationModeChange={handleRegistrationModeChange}
+              selectedAreaIds={selectedAreaIds}
+              onClearSelection={handleClearSelection}
+              rocagemAreas={rocagemAreas}
+              filters={filters}
+              onFilterChange={setFilters}
+              filteredCount={filteredRocagemAreas.length}
+            />
+          </BottomSheet>
+        </main>
+      </div>
+    );
+  }
+
+  // Desktop layout com Sidebar
   return (
     <SidebarProvider 
       style={style as React.CSSProperties}

@@ -54,6 +54,7 @@ interface AppSidebarProps {
   filters?: FilterCriteria;
   onFilterChange?: (filters: FilterCriteria) => void;
   filteredCount?: number;
+  standalone?: boolean;
 }
 
 export function AppSidebar({
@@ -72,6 +73,7 @@ export function AppSidebar({
   filters,
   onFilterChange,
   filteredCount = 0,
+  standalone = false,
 }: AppSidebarProps) {
   const { theme } = useTheme();
   
@@ -81,20 +83,19 @@ export function AppSidebar({
     }
   };
 
-  return (
-    <Sidebar className="border-r-0 sm:!max-w-none">
-      <SidebarHeader className="p-4 pb-3">
-        <div className="flex flex-col gap-1.5">
-          <img 
-            src={theme === 'dark' ? operacoesLogoNegativo : operacoesLogoPositivo} 
-            alt="Diretoria de Operações"
-            className="h-14 w-auto object-contain"
-          />
-          <p className="text-xs text-muted-foreground text-center leading-tight">Zeladoria em Tempo Real</p>
-        </div>
-      </SidebarHeader>
+  const header = (
+    <div className="flex flex-col gap-1.5">
+      <img 
+        src={theme === 'dark' ? operacoesLogoNegativo : operacoesLogoPositivo} 
+        alt="Diretoria de Operações"
+        className="h-14 w-auto object-contain"
+      />
+      <p className="text-xs text-muted-foreground text-center leading-tight">Zeladoria em Tempo Real</p>
+    </div>
+  );
 
-      <SidebarContent className="px-3">
+  const content = (
+    <>
         {selectedArea && onAreaClose && !isRegistrationMode ? (
           <div className="mb-4">
             <AreaInfoCard 
@@ -359,6 +360,29 @@ export function AppSidebar({
             </AccordionItem>
           </Accordion>
         </div>
+    </>
+  );
+
+  if (standalone) {
+    return (
+      <div className="flex flex-col h-full" data-testid="sidebar-standalone">
+        <div className="p-4 pb-3">
+          {header}
+        </div>
+        <div className="flex-1 overflow-auto px-3">
+          {content}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Sidebar className="border-r-0 sm:!max-w-none" data-testid="sidebar-wrapped">
+      <SidebarHeader className="p-4 pb-3">
+        {header}
+      </SidebarHeader>
+      <SidebarContent className="px-3">
+        {content}
       </SidebarContent>
     </Sidebar>
   );
