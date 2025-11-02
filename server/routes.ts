@@ -271,7 +271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/import-data", upload.single('csvFile'), async (req, res) => {
+  app.post("/api/admin/import-data", async (req, res) => {
     console.log("📥 Recebida requisição de importação");
     
     try {
@@ -285,24 +285,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return;
       }
       console.log("✅ Senha correta");
-
-      console.log("📄 Verificando arquivo...");
-      if (!req.file) {
-        console.log("❌ Nenhum arquivo enviado");
-        res.status(400).json({ error: "Arquivo CSV não enviado" });
-        return;
-      }
-      console.log(`✅ Arquivo recebido: ${req.file.originalname}, tamanho: ${req.file.size} bytes`);
-
-      const csvContent = req.file.buffer.toString('utf-8');
-      const lines = csvContent.split('\n').length;
-      console.log(`📊 CSV tem ${lines} linhas`);
       
       console.log("🔄 Importando módulo...");
       const { importRealData } = await import("../db/import-helper.js");
       
-      console.log("🚀 Iniciando importação...");
-      const result = await importRealData(csvContent);
+      console.log("🚀 Iniciando importação do arquivo server/data/areas_londrina.csv...");
+      const result = await importRealData();
       console.log(`✅ Importação concluída: ${result.inserted} inseridas, ${result.skipped} ignoradas`);
       
       res.json({ 
