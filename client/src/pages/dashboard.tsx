@@ -27,7 +27,7 @@ export default function Dashboard() {
     tipo: "all",
   });
   const [timeRangeFilter, setTimeRangeFilter] = useState<TimeRangeFilter>(null);
-  const [customFilterDate, setCustomFilterDate] = useState<Date | undefined>();
+  const [customFilterDateRange, setCustomFilterDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
   const mapRef = useRef<L.Map | null>(null);
 
   const handleServiceSelect = (service: string) => {
@@ -53,18 +53,17 @@ export default function Dashboard() {
     queryKey: ["/api/config"],
   });
 
-  // Função auxiliar para calcular dias desde última roçagem
-  const getDaysSinceLastMowing = (area: ServiceArea): number => {
-    if (area.history.length === 0) return -1;
+  // Função auxiliar para calcular dias ATÉ próxima previsão
+  const getDaysUntilNextMowing = (area: ServiceArea): number => {
+    if (!area.proximaPrevisao) return -1;
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    const lastHistory = area.history[area.history.length - 1];
-    const lastDate = new Date(lastHistory.date);
-    lastDate.setHours(0, 0, 0, 0);
+    const nextDate = new Date(area.proximaPrevisao);
+    nextDate.setHours(0, 0, 0, 0);
     
-    return Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.floor((nextDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   };
 
   // Filtrar áreas baseado nos critérios (incluindo filtro de tempo)
@@ -74,32 +73,38 @@ export default function Dashboard() {
     // Aplicar filtro de tempo primeiro
     if (timeRangeFilter) {
       areas = areas.filter(area => {
-        const days = getDaysSinceLastMowing(area);
+        // Filtro "Executando" - apenas áreas com status "Em Execução"
+        if (timeRangeFilter === 'executing') {
+          return area.status === 'Em Execução';
+        }
+
+        // Para outros filtros, calcular dias até próxima previsão
+        const days = getDaysUntilNextMowing(area);
         
-        // Se não tem histórico, não mostra em nenhum filtro de tempo
+        // Se não tem previsão, não mostra em nenhum filtro de tempo
         if (days === -1) return false;
 
         switch (timeRangeFilter) {
           case '0-5':
             return days >= 0 && days <= 5;
-          case '5-15':
+          case '6-15':
             return days > 5 && days <= 15;
-          case '15-25':
+          case '16-25':
             return days > 15 && days <= 25;
-          case '25-35':
-            return days > 25 && days <= 35;
-          case '35-44':
-            return days > 35 && days <= 44;
-          case '45+':
-            return days > 44;
+          case '26-40':
+            return days > 25 && days <= 40;
+          case '41-45':
+            return days > 40 && days <= 45;
           case 'custom':
-            if (!customFilterDate) return false;
-            const filterDate = new Date(customFilterDate);
-            filterDate.setHours(0, 0, 0, 0);
-            const lastHistory = area.history[area.history.length - 1];
-            const lastDate = new Date(lastHistory.date);
-            lastDate.setHours(0, 0, 0, 0);
-            return lastDate.getTime() === filterDate.getTime();
+            // Filtro por range de datas
+            if (!customFilterDateRange.from || !customFilterDateRange.to || !area.proximaPrevisao) return false;
+            const fromDate = new Date(customFilterDateRange.from);
+            fromDate.setHours(0, 0, 0, 0);
+            const toDate = new Date(customFilterDateRange.to);
+            toDate.setHours(0, 0, 0, 0);
+            const nextDate = new Date(area.proximaPrevisao);
+            nextDate.setHours(0, 0, 0, 0);
+            return nextDate >= fromDate && nextDate <= toDate;
           default:
             return true;
         }
@@ -132,7 +137,7 @@ export default function Dashboard() {
 
       return true;
     });
-  }, [rocagemAreas, filters, timeRangeFilter, customFilterDate]);
+  }, [rocagemAreas, filters, timeRangeFilter, customFilterDateRange]);
 
   const hasActiveFilters = filters.search || 
     (filters.bairro && filters.bairro !== "all") || 
@@ -203,10 +208,10 @@ export default function Dashboard() {
     setSelectedAreaIds(new Set());
   };
 
-  const handleTimeRangeFilterChange = (filter: TimeRangeFilter, customDate?: Date) => {
+  const handleTimeRangeFilterChange = (filter: TimeRangeFilter, customDateRange?: { from: Date | undefined; to: Date | undefined }) => {
     setTimeRangeFilter(filter);
-    // Sempre atualizar customFilterDate (undefined para filtros não-custom)
-    setCustomFilterDate(customDate);
+    // Sempre atualizar customFilterDateRange (undefined para filtros não-custom)
+    setCustomFilterDateRange(customDateRange || { from: undefined, to: undefined });
   };
 
   // Mobile layout com BottomSheet

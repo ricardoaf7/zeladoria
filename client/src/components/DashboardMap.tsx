@@ -365,41 +365,45 @@ function getAreaColor(area: ServiceArea, today: Date, isSelected = false): strin
     return "#9333ea"; // Roxo para selecionado
   }
 
+  // Executando agora - verde forte com pulsação
   if (area.status === "Em Execução") {
-    return "#10b981"; // Verde forte para em execução
+    return "#10b981";
   }
 
-  // Sistema de cores baseado em ciclo de 45 dias
-  // Quanto mais próximo da execução, mais forte a cor verde
-  if (area.history.length > 0) {
-    const lastHistory = area.history[area.history.length - 1];
-    const lastDate = new Date(lastHistory.date);
-    lastDate.setHours(0, 0, 0, 0);
+  // Sistema baseado em PRÓXIMA previsão (dias ATÉ roçar)
+  // Quanto mais distante, mais claro o verde
+  if (area.proximaPrevisao) {
+    const nextDate = new Date(area.proximaPrevisao);
+    nextDate.setHours(0, 0, 0, 0);
     
-    const daysSinceLastMowing = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+    const daysUntilMowing = Math.floor((nextDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
-    // 5 escalas de cor baseadas no ciclo de 45 dias
-    if (daysSinceLastMowing >= 0 && daysSinceLastMowing <= 5) {
-      // Recém roçado (0-5 dias) - Verde muito claro
-      return "#d1fae5";
-    } else if (daysSinceLastMowing > 5 && daysSinceLastMowing <= 15) {
-      // Roçado recentemente (5-15 dias) - Verde claro
-      return "#a7f3d0";
-    } else if (daysSinceLastMowing > 15 && daysSinceLastMowing <= 25) {
-      // Meio do ciclo (15-25 dias) - Verde médio
-      return "#6ee7b7";
-    } else if (daysSinceLastMowing > 25 && daysSinceLastMowing <= 35) {
-      // Próximo da roçagem (25-35 dias) - Verde mais forte
-      return "#34d399";
-    } else if (daysSinceLastMowing > 35 && daysSinceLastMowing <= 44) {
-      // Muito próximo da roçagem (35-44 dias) - Verde forte
+    // Previsão próxima (0-5 dias) - Verde
+    if (daysUntilMowing >= 0 && daysUntilMowing <= 5) {
       return "#10b981";
-    } else if (daysSinceLastMowing > 44) {
-      // Atrasado (>45 dias) - Vermelho/alerta
+    } 
+    // Previsão (6-15 dias) - Verde médio
+    else if (daysUntilMowing > 5 && daysUntilMowing <= 15) {
+      return "#34d399";
+    } 
+    // Previsão (16-25 dias) - Verde mais claro
+    else if (daysUntilMowing > 15 && daysUntilMowing <= 25) {
+      return "#6ee7b7";
+    } 
+    // Previsão (26-40 dias) - Verde claro
+    else if (daysUntilMowing > 25 && daysUntilMowing <= 40) {
+      return "#a7f3d0";
+    } 
+    // Previsão (41-45 dias) - Vermelho (últimos do ciclo)
+    else if (daysUntilMowing > 40 && daysUntilMowing <= 45) {
       return "#ef4444";
+    }
+    // Fora das categorias definidas - cinza
+    else {
+      return "#9ca3af";
     }
   }
 
-  // Sem histórico - cinza
+  // Sem previsão - cinza
   return "#9ca3af";
 }

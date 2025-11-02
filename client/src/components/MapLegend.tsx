@@ -9,36 +9,36 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export type TimeRangeFilter = 
-  | '0-5'    // 0-5 dias
-  | '5-15'   // 5-15 dias
-  | '15-25'  // 15-25 dias
-  | '25-35'  // 25-35 dias
-  | '35-44'  // 35-44 dias
-  | '45+'    // >45 dias (atrasado)
-  | 'custom' // Personalizado
-  | null;    // Todos
+  | 'executing' // Executando
+  | '0-5'       // 0-5 dias
+  | '6-15'      // 6-15 dias
+  | '16-25'     // 16-25 dias
+  | '26-40'     // 26-40 dias
+  | '41-45'     // 41-45 dias
+  | 'custom'    // Personalizado
+  | null;       // Todos
 
 interface MapLegendProps {
   activeFilter: TimeRangeFilter;
   onFilterChange: (filter: TimeRangeFilter) => void;
-  customDate?: Date;
-  onCustomDateChange?: (date: Date | undefined) => void;
+  customDateRange?: { from: Date | undefined; to: Date | undefined };
+  onCustomDateRangeChange?: (range: { from: Date | undefined; to: Date | undefined }) => void;
 }
 
 const timeRanges = [
-  { value: '0-5' as const, label: '0-5 dias', sublabel: 'Recém roçado', color: '#d1fae5' },
-  { value: '5-15' as const, label: '5-15 dias', sublabel: 'Recente', color: '#a7f3d0' },
-  { value: '15-25' as const, label: '15-25 dias', sublabel: 'Médio', color: '#6ee7b7' },
-  { value: '25-35' as const, label: '25-35 dias', sublabel: 'Próximo', color: '#34d399' },
-  { value: '35-44' as const, label: '35-44 dias', sublabel: 'Muito próximo', color: '#10b981' },
-  { value: '45+' as const, label: 'Mais de 45 dias', sublabel: 'Atrasado', color: '#ef4444' },
+  { value: 'executing' as const, label: 'Executando', sublabel: 'Roçando agora', color: '#10b981', isPulsing: true },
+  { value: '0-5' as const, label: '0-5 dias', sublabel: 'Próxima previsão', color: '#10b981' },
+  { value: '6-15' as const, label: '6-15 dias', sublabel: 'Previsão breve', color: '#34d399' },
+  { value: '16-25' as const, label: '16-25 dias', sublabel: 'Previsão média', color: '#6ee7b7' },
+  { value: '26-40' as const, label: '26-40 dias', sublabel: 'Previsão distante', color: '#a7f3d0' },
+  { value: '41-45' as const, label: '41-45 dias', sublabel: 'Último do ciclo', color: '#ef4444' },
 ];
 
 export function MapLegend({ 
   activeFilter, 
   onFilterChange, 
-  customDate, 
-  onCustomDateChange 
+  customDateRange, 
+  onCustomDateRangeChange 
 }: MapLegendProps) {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
@@ -47,6 +47,11 @@ export function MapLegend({
     if (activeFilter === filter) {
       onFilterChange(null);
     } else {
+      // Para filtro custom, não ativar se não tem range completo
+      if (filter === 'custom' && (!customDateRange?.from || !customDateRange?.to)) {
+        // Não fazer nada - precisa selecionar datas primeiro
+        return;
+      }
       onFilterChange(filter);
     }
   };
@@ -62,7 +67,7 @@ export function MapLegend({
       
       <CardContent className="space-y-3">
         <div className="space-y-2">
-          <div className="text-xs font-semibold opacity-80">Tempo desde última roçagem</div>
+          <div className="text-xs font-semibold opacity-80">Previsão de Roçagem</div>
           <div className="text-[10px] opacity-60 mb-2">Clique para filtrar as áreas</div>
           
           {/* Botão "Todos" */}
@@ -89,11 +94,11 @@ export function MapLegend({
               size="sm"
               className="w-full justify-start text-xs h-auto py-2"
               onClick={() => handleFilterClick(range.value)}
-              data-testid={`filter-${range.value}`}
+              data-testid={`button-filter-${range.value}`}
             >
               <div className="flex items-center gap-2 w-full">
                 <div 
-                  className="w-3 h-3 rounded-full flex-shrink-0" 
+                  className={`w-3 h-3 rounded-full flex-shrink-0 ${range.isPulsing ? 'animate-pulse' : ''}`}
                   style={{ backgroundColor: range.color }}
                 ></div>
                 <div className="flex-1 text-left">
@@ -106,22 +111,23 @@ export function MapLegend({
 
           <Separator className="my-2" />
 
-          {/* Filtro personalizado com data */}
+          {/* Filtro personalizado com período de datas */}
           <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant={activeFilter === 'custom' ? "default" : "outline"}
                 size="sm"
                 className="w-full justify-start text-xs h-auto py-2"
-                data-testid="filter-custom"
+                data-testid="button-filter-custom"
               >
                 <div className="flex items-center gap-2 w-full">
                   <Calendar className="w-3 h-3" />
                   <div className="flex-1 text-left">
-                    <div className="font-medium">Personalizado</div>
-                    {customDate && (
+                    <div className="font-medium">Período Personalizado</div>
+                    {customDateRange?.from && (
                       <div className="text-[10px] opacity-70">
-                        {format(customDate, 'dd/MM/yyyy', { locale: ptBR })}
+                        {format(customDateRange.from, 'dd/MM/yyyy', { locale: ptBR })}
+                        {customDateRange.to && ` - ${format(customDateRange.to, 'dd/MM/yyyy', { locale: ptBR })}`}
                       </div>
                     )}
                   </div>
@@ -130,18 +136,24 @@ export function MapLegend({
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <CalendarComponent
-                mode="single"
-                selected={customDate}
-                onSelect={(date) => {
-                  // Passar a data diretamente ao invés de depender de estado assíncrono
-                  if (date && onCustomDateChange) {
-                    onCustomDateChange(date);
-                    // Não chamar onFilterChange aqui - deixar o pai gerenciar
+                mode="range"
+                selected={customDateRange}
+                onSelect={(range) => {
+                  if (range && onCustomDateRangeChange) {
+                    // DateRange pode ter 'to' como undefined, mas nossa interface precisa de ambos definidos
+                    const normalizedRange = {
+                      from: range.from,
+                      to: range.to || range.from // Se 'to' não definido, usar 'from'
+                    };
+                    onCustomDateRangeChange(normalizedRange);
                   }
-                  setIsCalendarOpen(false);
+                  // Fechar apenas se um range completo foi selecionado
+                  if (range?.from && range?.to) {
+                    setIsCalendarOpen(false);
+                  }
                 }}
                 locale={ptBR}
-                disabled={(date) => date > new Date()}
+                numberOfMonths={1}
                 initialFocus
               />
             </PopoverContent>

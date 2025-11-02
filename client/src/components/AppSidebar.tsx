@@ -56,7 +56,7 @@ interface AppSidebarProps {
   onFilterChange?: (filters: FilterCriteria) => void;
   filteredCount?: number;
   standalone?: boolean;
-  onTimeRangeFilterChange?: (filter: TimeRangeFilter, customDate?: Date) => void;
+  onTimeRangeFilterChange?: (filter: TimeRangeFilter, customDateRange?: { from: Date | undefined; to: Date | undefined }) => void;
 }
 
 export function AppSidebar({
@@ -80,7 +80,7 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const { theme } = useTheme();
   const [activeTimeFilter, setActiveTimeFilter] = useState<TimeRangeFilter>(null);
-  const [customDate, setCustomDate] = useState<Date | undefined>();
+  const [customDateRange, setCustomDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
   
   const handleServiceClick = (service: string) => {
     if (onServiceSelect) {
@@ -96,19 +96,25 @@ export function AppSidebar({
   const handleTimeFilterChange = (filter: TimeRangeFilter) => {
     setActiveTimeFilter(filter);
     if (onTimeRangeFilterChange) {
-      // Para filtros não-custom, passar undefined como data
-      // Para filtro custom, passar a data armazenada
-      const dateToPass = filter === 'custom' ? customDate : undefined;
-      onTimeRangeFilterChange(filter, dateToPass);
+      // Para filtros não-custom, passar undefined como range
+      // Para filtro custom, passar o range armazenado
+      const rangeToPass = filter === 'custom' ? customDateRange : undefined;
+      onTimeRangeFilterChange(filter, rangeToPass);
     }
   };
 
-  const handleCustomDateChange = (date: Date | undefined) => {
-    setCustomDate(date);
-    // Quando uma data é selecionada, ativar o filtro 'custom' automaticamente com a data
-    if (onTimeRangeFilterChange && date) {
+  const handleCustomDateRangeChange = (range: { from: Date | undefined; to: Date | undefined }) => {
+    setCustomDateRange(range);
+    // Quando um range completo é selecionado, ativar o filtro 'custom' automaticamente
+    if (onTimeRangeFilterChange && range.from && range.to) {
       setActiveTimeFilter('custom');
-      onTimeRangeFilterChange('custom', date);
+      onTimeRangeFilterChange('custom', range);
+    } else if (onTimeRangeFilterChange && (!range.from || !range.to)) {
+      // Se o range está incompleto e custom estava ativo, desativar
+      if (activeTimeFilter === 'custom') {
+        setActiveTimeFilter(null);
+        onTimeRangeFilterChange(null, undefined);
+      }
     }
   };
 
@@ -223,8 +229,8 @@ export function AppSidebar({
                           <MapLegend 
                             activeFilter={activeTimeFilter}
                             onFilterChange={handleTimeFilterChange}
-                            customDate={customDate}
-                            onCustomDateChange={handleCustomDateChange}
+                            customDateRange={customDateRange}
+                            onCustomDateRangeChange={handleCustomDateRangeChange}
                           />
                           <Separator className="my-3" />
                         </div>
