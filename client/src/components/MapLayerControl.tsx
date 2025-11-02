@@ -43,7 +43,7 @@ export function MapLayerControl({ currentLayer, onLayerChange }: MapLayerControl
         </Button>
 
         {isOpen && (
-          <div className="absolute top-full right-0 mt-2 bg-popover border border-border rounded-md shadow-lg overflow-hidden min-w-[140px]">
+          <div className="absolute top-full right-0 mt-2 bg-popover border border-border rounded-md shadow-lg overflow-hidden min-w-[140px] z-[1001]">
             <button
               onClick={() => handleLayerSelect("standard")}
               className={`w-full px-4 py-2 text-sm text-left hover-elevate active-elevate-2 ${
