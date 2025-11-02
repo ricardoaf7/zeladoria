@@ -36,6 +36,7 @@ Preferred communication style: Simple, everyday language.
 **Persistence Layer**: Drizzle ORM with PostgreSQL dialect and Neon serverless driver, utilizing JSONB columns and automatic timestamping.
 **Migration & Seeding**: Drizzle Kit for schema migrations; `db/seed.ts` for initial data population.
 **Admin Import System**: Password-protected web endpoint (`POST /api/admin/import-data`) with UI at `/admin/import` for one-time bulk import of 1125 real service areas from CSV (`/tmp/areas_londrina.csv`). Uses shared import helper (`db/import-helper.ts`) for parsing, batching, and database population. Intended for production database seeding only—should be removed after use.
+**Admin Clear Simulation**: Password-protected endpoint (`POST /api/admin/clear-simulation`) with UI button at `/admin/import` to reset all simulation data (history, status, ultimaRocagem, proximaPrevisao) for executive presentations. Password: `cmtu2025`. Implementation uses dedicated `clearSimulationData()` method in storage layer with proper camelCase to snake_case mapping for PostgreSQL.
 
 ## External Dependencies
 
