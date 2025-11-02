@@ -37,7 +37,7 @@ function convertBrazilianNumber(value: string): number | null {
   return isNaN(num) ? null : num;
 }
 
-export async function importRealData() {
+export async function importRealData(csvContent?: string) {
   const connectionString = process.env.DATABASE_URL;
   
   if (!connectionString) {
@@ -48,14 +48,21 @@ export async function importRealData() {
   const db = drizzle(pool);
 
   try {
-    const csvPath = "/tmp/areas_londrina.csv";
+    let content: string;
     
-    if (!fs.existsSync(csvPath)) {
-      throw new Error("Arquivo CSV não encontrado em /tmp/areas_londrina.csv");
+    if (csvContent) {
+      content = csvContent;
+    } else {
+      const csvPath = "/tmp/areas_londrina.csv";
+      
+      if (!fs.existsSync(csvPath)) {
+        throw new Error("Arquivo CSV não encontrado em /tmp/areas_londrina.csv");
+      }
+      
+      content = fs.readFileSync(csvPath, 'utf-8');
     }
     
-    const csvContent = fs.readFileSync(csvPath, 'utf-8');
-    const lines = csvContent.split('\n').filter(line => line.trim() !== '');
+    const lines = content.split('\n').filter(line => line.trim() !== '');
     
     const dataLines = lines.slice(1);
     
