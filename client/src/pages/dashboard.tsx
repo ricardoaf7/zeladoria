@@ -88,10 +88,11 @@ export default function Dashboard() {
     }
   }, [selectedArea]);
 
+  // Largura responsiva: 85% em mobile, 21rem em desktop
   const style = {
-    "--sidebar-width": "21rem",
+    "--sidebar-width": "min(85vw, 21rem)",
     "--sidebar-width-icon": "4rem",
-  };
+  } as React.CSSProperties;
 
   const handleAreaClick = (area: ServiceArea) => {
     if (selectionMode) {
