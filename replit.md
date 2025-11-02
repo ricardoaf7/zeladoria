@@ -35,6 +35,7 @@ Preferred communication style: Simple, everyday language.
 **Scheduling Algorithm**: Calculates mowing schedules based on business days, area size, and production rates, respecting manual scheduling flags.
 **Persistence Layer**: Drizzle ORM with PostgreSQL dialect and Neon serverless driver, utilizing JSONB columns and automatic timestamping.
 **Migration & Seeding**: Drizzle Kit for schema migrations; `db/seed.ts` for initial data population.
+**Admin Import System**: Password-protected web endpoint (`POST /api/admin/import-data`) with UI at `/admin/import` for one-time bulk import of 1125 real service areas from CSV (`/tmp/areas_londrina.csv`). Uses shared import helper (`db/import-helper.ts`) for parsing, batching, and database population. Intended for production database seeding only—should be removed after use.
 
 ## External Dependencies
 
