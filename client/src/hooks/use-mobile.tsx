@@ -15,5 +15,6 @@ export function useIsMobile() {
     return () => mql.removeEventListener("change", onChange)
   }, [])
 
-  return !!isMobile
+  // Mobile-first: default to true when undefined (before hydration)
+  return isMobile ?? (typeof window !== 'undefined' && window.innerWidth < MOBILE_BREAKPOINT)
 }
