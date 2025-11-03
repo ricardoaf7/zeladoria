@@ -235,11 +235,25 @@ export function DashboardMap({
       // Evento quando o usuário termina de arrastar (PC ou mobile)
       marker.on("dragend", (e) => {
         const newPos = (e.target as L.Marker).getLatLng();
-        updatePositionMutation.mutate({
-          areaId: area.id,
-          lat: newPos.lat,
-          lng: newPos.lng,
-        });
+        
+        // Validar coordenadas antes de salvar
+        if (
+          newPos && 
+          typeof newPos.lat === 'number' && 
+          typeof newPos.lng === 'number' &&
+          !isNaN(newPos.lat) && 
+          !isNaN(newPos.lng) &&
+          isFinite(newPos.lat) && 
+          isFinite(newPos.lng)
+        ) {
+          updatePositionMutation.mutate({
+            areaId: area.id,
+            lat: newPos.lat,
+            lng: newPos.lng,
+          });
+        } else {
+          console.warn('Coordenadas inválidas recebidas no dragend:', newPos);
+        }
       });
 
       marker.addTo(layerGroup);
