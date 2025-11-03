@@ -198,7 +198,7 @@ export function DashboardMap({
           fillOpacity: isFiltered ? 0.6 : 0.2,
           weight: 2,
           opacity: opacity,
-          className: isPulsing ? "animate-pulse" : "",
+          className: isPulsing ? "pulsing-marker" : "",
         });
 
         circle.bindTooltip(
