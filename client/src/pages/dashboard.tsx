@@ -6,7 +6,7 @@ import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/s
 import { BottomSheet, type BottomSheetState } from "@/components/BottomSheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
-import type { ServiceArea, Team, AppConfig } from "@shared/schema";
+import type { ServiceArea, AppConfig } from "@shared/schema";
 import type { FilterCriteria } from "@/components/FilterPanel";
 import type { TimeRangeFilter } from "@/components/MapLegend";
 import { Button } from "@/components/ui/button";
@@ -44,10 +44,6 @@ export default function Dashboard() {
 
   const { data: jardinsAreas = [] } = useQuery<ServiceArea[]>({
     queryKey: ["/api/areas/jardins"],
-  });
-
-  const { data: teams = [] } = useQuery<Team[]>({
-    queryKey: ["/api/teams"],
   });
 
   const { data: config } = useQuery<AppConfig>({
@@ -250,15 +246,10 @@ export default function Dashboard() {
           <DashboardMap
             rocagemAreas={rocagemAreas}
             jardinsAreas={jardinsAreas}
-            teams={teams}
             layerFilters={{
               rocagemLote1: selectedService === 'rocagem',
               rocagemLote2: selectedService === 'rocagem',
               jardins: selectedService === 'jardins',
-              teamsGiroZero: true,
-              teamsAcabamento: true,
-              teamsColeta: true,
-              teamsCapina: true,
             }}
             onAreaClick={handleAreaClick}
             filteredAreaIds={hasActiveFilters ? new Set(filteredRocagemAreas.map(a => a.id)) : undefined}
@@ -331,15 +322,10 @@ export default function Dashboard() {
             <DashboardMap
               rocagemAreas={rocagemAreas}
               jardinsAreas={jardinsAreas}
-              teams={teams}
               layerFilters={{
                 rocagemLote1: selectedService === 'rocagem',
                 rocagemLote2: selectedService === 'rocagem',
                 jardins: selectedService === 'jardins',
-                teamsGiroZero: true,
-                teamsAcabamento: true,
-                teamsColeta: true,
-                teamsCapina: true,
               }}
               onAreaClick={handleAreaClick}
               filteredAreaIds={hasActiveFilters ? new Set(filteredRocagemAreas.map(a => a.id)) : undefined}

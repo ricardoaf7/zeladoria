@@ -6,20 +6,15 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { formatDateBR } from "@/lib/utils";
 import { MapLayerControl, type MapLayerType } from "./MapLayerControl";
-import type { ServiceArea, Team } from "@shared/schema";
+import type { ServiceArea } from "@shared/schema";
 
 interface DashboardMapProps {
   rocagemAreas: ServiceArea[];
   jardinsAreas: ServiceArea[];
-  teams: Team[];
   layerFilters: {
     rocagemLote1: boolean;
     rocagemLote2: boolean;
     jardins: boolean;
-    teamsGiroZero: boolean;
-    teamsAcabamento: boolean;
-    teamsColeta: boolean;
-    teamsCapina: boolean;
   };
   onAreaClick: (area: ServiceArea) => void;
   mapRef?: React.MutableRefObject<L.Map | null>;
@@ -31,7 +26,6 @@ interface DashboardMapProps {
 export function DashboardMap({
   rocagemAreas,
   jardinsAreas,
-  teams,
   layerFilters,
   onAreaClick,
   mapRef: externalMapRef,
@@ -122,10 +116,6 @@ export function DashboardMap({
       rocagemLote1: L.layerGroup().addTo(map),
       rocagemLote2: L.layerGroup().addTo(map),
       jardins: L.layerGroup().addTo(map),
-      teamsGiroZero: L.layerGroup().addTo(map),
-      teamsAcabamento: L.layerGroup().addTo(map),
-      teamsColeta: L.layerGroup().addTo(map),
-      teamsCapina: L.layerGroup().addTo(map),
     };
 
     mapRef.current = map;
@@ -195,43 +185,64 @@ export function DashboardMap({
       const color = getAreaColor(area, today, isSelected);
       const isPulsing = area.status === "Em Execução";
 
-      // Usar círculo para todas as áreas
-      {
-        const circle = L.circleMarker([area.lat, area.lng], {
-          radius: 8,
-          color: color,
-          fillColor: color,
-          fillOpacity: 0.6,
-          weight: 2,
-          opacity: 1,
-          className: isPulsing ? "pulsing-marker" : "",
+      // Criar um ícone div circular arrastável
+      const icon = L.divIcon({
+        className: "area-marker",
+        html: `<div style="
+          background-color: ${color};
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          border: 2px solid ${color};
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          opacity: 0.9;
+          cursor: move;
+          ${isPulsing ? 'animation: marker-blink 2s ease-in-out infinite;' : ''}
+        "></div>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+      });
+
+      const marker = L.marker([area.lat, area.lng], { 
+        icon,
+        draggable: true, // Habilita drag em PC e mobile
+      });
+
+      marker.bindTooltip(
+        `<div class="font-sans text-xs">
+          <strong>${area.endereco}</strong><br/>
+          ${area.metragem_m2 ? `Metragem: ${area.metragem_m2.toLocaleString('pt-BR')} m²<br/>` : ''}
+          ${area.ultimaRocagem ? `Última Roçagem: ${formatDateBR(area.ultimaRocagem)}<br/>` : ''}
+          ${area.proximaPrevisao ? `Previsão: ${formatDateBR(area.proximaPrevisao)}` : 'Sem previsão'}
+        </div>`,
+        {
+          sticky: true,
+          opacity: 0.9,
+        }
+      );
+
+      marker.bindPopup(
+        `<div class="font-sans">
+          <strong>${area.endereco}</strong><br/>
+          ${area.metragem_m2 ? `Metragem: ${area.metragem_m2.toLocaleString('pt-BR')} m²<br/>` : ''}
+          ${area.ultimaRocagem ? `Última Roçagem: ${formatDateBR(area.ultimaRocagem)}<br/>` : ''}
+          ${area.proximaPrevisao ? `Previsão: ${formatDateBR(area.proximaPrevisao)}` : 'Sem previsão'}
+        </div>`
+      );
+
+      marker.on("click", () => onAreaClick(area));
+
+      // Evento quando o usuário termina de arrastar (PC ou mobile)
+      marker.on("dragend", (e) => {
+        const newPos = (e.target as L.Marker).getLatLng();
+        updatePositionMutation.mutate({
+          areaId: area.id,
+          lat: newPos.lat,
+          lng: newPos.lng,
         });
+      });
 
-        circle.bindTooltip(
-          `<div class="font-sans text-xs">
-            <strong>${area.endereco}</strong><br/>
-            ${area.metragem_m2 ? `Metragem: ${area.metragem_m2.toLocaleString('pt-BR')} m²<br/>` : ''}
-            ${area.ultimaRocagem ? `Última Roçagem: ${formatDateBR(area.ultimaRocagem)}<br/>` : ''}
-            ${area.proximaPrevisao ? `Previsão: ${formatDateBR(area.proximaPrevisao)}` : 'Sem previsão'}
-          </div>`,
-          {
-            sticky: true,
-            opacity: 0.9,
-          }
-        );
-
-        circle.bindPopup(
-          `<div class="font-sans">
-            <strong>${area.endereco}</strong><br/>
-            ${area.metragem_m2 ? `Metragem: ${area.metragem_m2.toLocaleString('pt-BR')} m²<br/>` : ''}
-            ${area.ultimaRocagem ? `Última Roçagem: ${formatDateBR(area.ultimaRocagem)}<br/>` : ''}
-            ${area.proximaPrevisao ? `Previsão: ${formatDateBR(area.proximaPrevisao)}` : 'Sem previsão'}
-          </div>`
-        );
-
-        circle.on("click", () => onAreaClick(area));
-        circle.addTo(layerGroup);
-      }
+      marker.addTo(layerGroup);
     });
   }, [rocagemAreas, onAreaClick, selectedAreaIds, filteredAreaIds]);
 
@@ -262,99 +273,6 @@ export function DashboardMap({
       marker.addTo(layerGroupsRef.current.jardins!);
     });
   }, [jardinsAreas, onAreaClick]);
-
-  useEffect(() => {
-    if (!mapRef.current) return;
-
-    Object.values(layerGroupsRef.current).forEach((layer) => {
-      if (layer && typeof layer.eachLayer === "function") {
-        layer.eachLayer((l) => {
-          if (l instanceof L.Marker && l.options.icon?.options.className?.includes("team-marker")) {
-            layer.removeLayer(l);
-          }
-        });
-      }
-    });
-
-    teams.forEach((team) => {
-      let layerGroup: L.LayerGroup | undefined;
-      let teamColor: string;
-      let teamLabel: string;
-      let borderColor: string;
-      let borderWidth: number;
-
-      if (team.type === "Giro Zero") {
-        layerGroup = layerGroupsRef.current.teamsGiroZero;
-        teamColor = "#3b82f6"; // Azul
-        teamLabel = "GZ";
-        borderColor = "#1e40af";
-        borderWidth = team.status === "Working" ? 3 : 2;
-      } else if (team.type === "Acabamento") {
-        layerGroup = layerGroupsRef.current.teamsAcabamento;
-        teamColor = "#8b5cf6"; // Roxo
-        teamLabel = "AC";
-        borderColor = "#6d28d9";
-        borderWidth = team.status === "Working" ? 3 : 2;
-      } else if (team.type === "Coleta") {
-        layerGroup = layerGroupsRef.current.teamsColeta;
-        teamColor = "#f59e0b"; // Laranja
-        teamLabel = "CO";
-        borderColor = "#d97706";
-        borderWidth = team.status === "Working" ? 3 : 2;
-      } else if (team.type === "Capina") {
-        layerGroup = layerGroupsRef.current.teamsCapina;
-        teamColor = "#10b981"; // Verde
-        teamLabel = "CP";
-        borderColor = "#059669";
-        borderWidth = team.status === "Working" ? 3 : 2;
-      } else {
-        return;
-      }
-
-      if (!layerGroup) return;
-
-      const opacity = team.status === "Idle" ? 0.6 : 1;
-      const pulseAnimation = team.status === "Working" 
-        ? "animation: pulse 2s infinite;" 
-        : "";
-      
-      const icon = L.divIcon({
-        className: `team-marker-${team.type.toLowerCase().replace(/\s/g, "-")}`,
-        html: `<div style="
-          background-color: ${teamColor};
-          color: white;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          font-weight: bold;
-          border: ${borderWidth}px solid ${borderColor};
-          box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-          opacity: ${opacity};
-          ${pulseAnimation}
-        ">${teamLabel}</div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-      });
-
-      const marker = L.marker([team.location.lat, team.location.lng], { icon });
-
-      marker.bindTooltip(
-        `<div class="font-sans">
-          <strong>Equipe ${team.id}: ${team.type}</strong><br/>
-          Status: ${team.status}<br/>
-          ${team.lote ? `Lote: ${team.lote}` : ''}
-        </div>`,
-        { permanent: false, direction: 'top', offset: [0, -10] }
-      );
-
-      marker.addTo(layerGroup);
-    });
-
-  }, [teams]);
 
   return (
     <div className="relative w-full h-full">
