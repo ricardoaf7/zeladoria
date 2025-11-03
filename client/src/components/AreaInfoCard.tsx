@@ -276,7 +276,7 @@ export function AreaInfoCard({ area, onClose, onUpdate }: AreaInfoCardProps) {
                   const isForecast = item.type === 'forecast';
                   return (
                     <li key={index} className={isForecast ? "text-blue-600 dark:text-blue-400" : "text-green-600 dark:text-green-400"}>
-                      • {formatDateBR(item.date)} - {isForecast ? 'Previsto para' : 'Concluído em'} {item.status}
+                      • {isForecast ? 'Previsão:' : 'Última Roçagem:'} {formatDateBR(item.date)}
                     </li>
                   );
                 })}

@@ -223,9 +223,9 @@ export function DashboardMap({
         circle.bindPopup(
           `<div class="font-sans">
             <strong>${area.endereco}</strong><br/>
-            Status: ${area.status}<br/>
             ${area.metragem_m2 ? `Metragem: ${area.metragem_m2.toLocaleString('pt-BR')} m²<br/>` : ''}
-            ${area.scheduledDate ? `Agendado: ${formatDateBR(area.scheduledDate)}` : ''}
+            ${area.ultimaRocagem ? `Última Roçagem: ${formatDateBR(area.ultimaRocagem)}<br/>` : ''}
+            ${area.proximaPrevisao ? `Previsão: ${formatDateBR(area.proximaPrevisao)}` : 'Sem previsão'}
           </div>`
         );
 
