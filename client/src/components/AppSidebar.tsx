@@ -57,6 +57,7 @@ interface AppSidebarProps {
   filteredCount?: number;
   standalone?: boolean;
   onTimeRangeFilterChange?: (filter: TimeRangeFilter, customDateRange?: { from: Date | undefined; to: Date | undefined }) => void;
+  showQuickRegisterModal?: boolean;
 }
 
 export function AppSidebar({
@@ -77,6 +78,7 @@ export function AppSidebar({
   filteredCount = 0,
   standalone = false,
   onTimeRangeFilterChange,
+  showQuickRegisterModal = false,
 }: AppSidebarProps) {
   const { theme } = useTheme();
   const [activeTimeFilter, setActiveTimeFilter] = useState<TimeRangeFilter>(null);
@@ -150,7 +152,7 @@ export function AppSidebar({
 
   const content = (
     <>
-        {selectedArea && onAreaClose && !isRegistrationMode ? (
+        {selectedArea && onAreaClose && !isRegistrationMode && !showQuickRegisterModal ? (
           <div className="mb-4">
             <AreaInfoCard 
               area={selectedArea} 
