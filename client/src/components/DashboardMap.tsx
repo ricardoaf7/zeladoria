@@ -21,6 +21,7 @@ interface DashboardMapProps {
   selectionMode?: boolean;
   selectedAreaIds?: Set<number>;
   filteredAreaIds?: Set<number>;
+  searchQuery?: string;
 }
 
 export function DashboardMap({
@@ -32,6 +33,7 @@ export function DashboardMap({
   selectionMode = false,
   selectedAreaIds = new Set(),
   filteredAreaIds,
+  searchQuery = '',
 }: DashboardMapProps) {
   const { toast } = useToast();
   const internalMapRef = useRef<L.Map | null>(null);
@@ -208,18 +210,36 @@ export function DashboardMap({
         draggable: true, // Habilita drag em PC e mobile
       });
 
-      marker.bindTooltip(
-        `<div class="font-sans text-xs">
-          <strong>${area.endereco}</strong><br/>
-          ${area.metragem_m2 ? `Metragem: ${area.metragem_m2.toLocaleString('pt-BR')} m²<br/>` : ''}
-          ${area.ultimaRocagem ? `Última Roçagem: ${formatDateBR(area.ultimaRocagem)}<br/>` : ''}
-          ${area.proximaPrevisao ? `Previsão: ${formatDateBR(area.proximaPrevisao)}` : 'Sem previsão'}
-        </div>`,
-        {
-          sticky: true,
-          opacity: 0.9,
-        }
-      );
+      // Tooltip permanente discreto quando há busca ativa
+      const hasActiveSearch = searchQuery.trim().length > 0;
+      
+      if (hasActiveSearch) {
+        // Label permanente discreto: apenas endereço ou lote
+        marker.bindTooltip(
+          `<div class="search-label">${area.endereco || `Lote ${area.lote}`}</div>`,
+          {
+            permanent: true,
+            direction: 'top',
+            className: 'search-tooltip',
+            opacity: 1,
+            offset: [0, -8],
+          }
+        );
+      } else {
+        // Tooltip normal no hover
+        marker.bindTooltip(
+          `<div class="font-sans text-xs">
+            <strong>${area.endereco}</strong><br/>
+            ${area.metragem_m2 ? `Metragem: ${area.metragem_m2.toLocaleString('pt-BR')} m²<br/>` : ''}
+            ${area.ultimaRocagem ? `Última Roçagem: ${formatDateBR(area.ultimaRocagem)}<br/>` : ''}
+            ${area.proximaPrevisao ? `Previsão: ${formatDateBR(area.proximaPrevisao)}` : 'Sem previsão'}
+          </div>`,
+          {
+            sticky: true,
+            opacity: 0.9,
+          }
+        );
+      }
 
       marker.bindPopup(
         `<div class="font-sans">
@@ -258,7 +278,7 @@ export function DashboardMap({
 
       marker.addTo(layerGroup);
     });
-  }, [rocagemAreas, onAreaClick, selectedAreaIds, filteredAreaIds]);
+  }, [rocagemAreas, onAreaClick, selectedAreaIds, filteredAreaIds, searchQuery]);
 
   useEffect(() => {
     if (!mapRef.current) return;
