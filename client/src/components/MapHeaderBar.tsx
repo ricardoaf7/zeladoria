@@ -84,15 +84,6 @@ export function MapHeaderBar({
       }).slice(0, 8) // Mostrar no máximo 8 sugestões
     : [];
 
-  // Debug logs
-  console.log('[MapHeaderBar] Debug:', {
-    searchQuery,
-    areasLength: areas.length,
-    suggestionsLength: suggestions.length,
-    showSuggestions,
-    searchTrimLength: searchQuery.trim().length
-  });
-
   // Fechar dropdown quando clicar fora
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

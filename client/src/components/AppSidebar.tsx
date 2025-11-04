@@ -85,23 +85,14 @@ export function AppSidebar({
   const { theme } = useTheme();
   const [activeTimeFilter, setActiveTimeFilter] = useState<TimeRangeFilter>(null);
   const [customDateRange, setCustomDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
-  const hasAutoAppliedFilter = useRef(false);
   
-  // Aplicar filtro "Executando" automaticamente ao selecionar roçagem (apenas na primeira vez)
+  // Limpar filtro ao desselecionar roçagem
   useEffect(() => {
-    if (selectedService === 'rocagem' && !hasAutoAppliedFilter.current) {
-      setActiveTimeFilter('executing');
-      if (onTimeRangeFilterChange) {
-        onTimeRangeFilterChange('executing', undefined);
-      }
-      hasAutoAppliedFilter.current = true;
-    } else if (selectedService !== 'rocagem') {
-      // Limpar filtro e flag ao desselecionar roçagem
+    if (selectedService !== 'rocagem') {
       setActiveTimeFilter(null);
       if (onTimeRangeFilterChange) {
         onTimeRangeFilterChange(null, undefined);
       }
-      hasAutoAppliedFilter.current = false;
     }
   }, [selectedService]);
 
