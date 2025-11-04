@@ -153,10 +153,8 @@ export default function Dashboard() {
       const lng = selectedArea.lng;
       
       if (lat && lng) {
-        mapRef.current.panTo([lat, lng], { animate: true });
-        if (selectedArea.polygon) {
-          mapRef.current.setZoom(16);
-        }
+        // Sempre aproximar ao clicar em uma área (zoom 17 para boa visualização)
+        mapRef.current.setView([lat, lng], 17, { animate: true });
       }
     }
   }, [selectedArea]);
