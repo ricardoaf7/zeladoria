@@ -82,14 +82,18 @@ export class DbStorage implements IStorage {
   }
 
   async updateArea(id: number, data: Partial<ServiceArea>): Promise<ServiceArea | undefined> {
-    const updateData: any = { ...data, updatedAt: new Date() };
+    // Mapear camelCase para snake_case para corresponder ao schema do banco
+    const updateData: any = { updatedAt: new Date() };
     
-    if (data.polygon !== undefined) {
-      updateData.polygon = data.polygon;
-    }
-    if (data.history !== undefined) {
-      updateData.history = data.history;
-    }
+    if (data.endereco !== undefined) updateData.endereco = data.endereco;
+    if (data.bairro !== undefined) updateData.bairro = data.bairro;
+    if (data.metragem_m2 !== undefined) updateData.metragem_m2 = data.metragem_m2;
+    if (data.lote !== undefined) updateData.lote = data.lote;
+    if (data.ultimaRocagem !== undefined) updateData.ultimaRocagem = data.ultimaRocagem;
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.proximaPrevisao !== undefined) updateData.proximaPrevisao = data.proximaPrevisao;
+    if (data.polygon !== undefined) updateData.polygon = data.polygon;
+    if (data.history !== undefined) updateData.history = data.history;
     
     const results = await this.db
       .update(serviceAreas)

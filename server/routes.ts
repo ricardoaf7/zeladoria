@@ -197,6 +197,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bairro: z.string().optional(),
         metragem_m2: z.number().optional(),
         lote: z.number().optional(),
+        ultimaRocagem: z.string().optional(),
+        status: z.enum(["Pendente", "Em Execução", "Concluído"]).optional(),
       });
 
       const data = updateSchema.parse(req.body);
