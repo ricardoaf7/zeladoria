@@ -152,9 +152,21 @@ export default function Dashboard() {
       const lat = selectedArea.lat;
       const lng = selectedArea.lng;
       
-      if (lat && lng) {
+      // Validar coordenadas antes de fazer zoom
+      if (
+        lat && 
+        lng && 
+        typeof lat === 'number' && 
+        typeof lng === 'number' &&
+        !isNaN(lat) && 
+        !isNaN(lng) &&
+        isFinite(lat) && 
+        isFinite(lng)
+      ) {
         // Sempre aproximar ao clicar em uma área (zoom 17 para boa visualização)
         mapRef.current.setView([lat, lng], 17, { animate: true });
+      } else {
+        console.warn('Coordenadas inválidas para área:', selectedArea.id, { lat, lng });
       }
     }
   }, [selectedArea]);
