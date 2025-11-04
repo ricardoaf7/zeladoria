@@ -237,6 +237,22 @@ export default function Dashboard() {
     setCustomFilterDateRange(customDateRange || { from: undefined, to: undefined });
   };
 
+  const handleAreaSelectFromSearch = (area: ServiceArea) => {
+    // Centralizar mapa na área
+    if (mapRef.current && area.lat && area.lng) {
+      mapRef.current.setView([area.lat, area.lng], 17, { animate: true });
+    }
+    
+    // Selecionar área e abrir MapInfoCard
+    setSelectedArea(area);
+    setShowMapCard(true);
+    
+    // No mobile, minimizar o BottomSheet para ver melhor
+    if (isMobile) {
+      setBottomSheetState("minimized");
+    }
+  };
+
   // Mobile layout com BottomSheet
   if (isMobile) {
     const toggleBottomSheet = () => {
@@ -277,6 +293,8 @@ export default function Dashboard() {
             onFilterChange={handleTimeRangeFilterChange}
             filteredCount={filteredRocagemAreas.length}
             totalCount={rocagemAreas.length}
+            areas={filteredRocagemAreas}
+            onAreaSelect={handleAreaSelectFromSearch}
           />
         )}
         
@@ -388,6 +406,8 @@ export default function Dashboard() {
               onFilterChange={handleTimeRangeFilterChange}
               filteredCount={filteredRocagemAreas.length}
               totalCount={rocagemAreas.length}
+              areas={filteredRocagemAreas}
+              onAreaSelect={handleAreaSelectFromSearch}
             />
           )}
 
