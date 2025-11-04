@@ -154,7 +154,7 @@ export function AppSidebar({
 
   const content = (
     <>
-        {selectedArea && onAreaClose && !isRegistrationMode && !showQuickRegisterModal ? (
+        {selectedArea && onAreaClose && !isRegistrationMode && !showQuickRegisterModal && !showMapCard ? (
           <div className="mb-4">
             <AreaInfoCard 
               area={selectedArea} 
