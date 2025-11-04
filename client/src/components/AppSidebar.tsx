@@ -58,6 +58,7 @@ interface AppSidebarProps {
   standalone?: boolean;
   onTimeRangeFilterChange?: (filter: TimeRangeFilter, customDateRange?: { from: Date | undefined; to: Date | undefined }) => void;
   showQuickRegisterModal?: boolean;
+  showMapCard?: boolean;
 }
 
 export function AppSidebar({
@@ -79,6 +80,7 @@ export function AppSidebar({
   standalone = false,
   onTimeRangeFilterChange,
   showQuickRegisterModal = false,
+  showMapCard = false,
 }: AppSidebarProps) {
   const { theme } = useTheme();
   const [activeTimeFilter, setActiveTimeFilter] = useState<TimeRangeFilter>(null);
