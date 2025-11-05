@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/neon-serverless";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, or, ilike, and, sql } from "drizzle-orm";
 import { Pool, neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 import type { ServiceArea, Team, AppConfig } from "@shared/schema";
@@ -35,6 +35,27 @@ export class DbStorage implements IStorage {
     
     if (results.length === 0) return undefined;
     return this.mapDbAreaToServiceArea(results[0]);
+  }
+
+  async searchAreas(query: string, serviceType: string, limit: number = 50): Promise<ServiceArea[]> {
+    const searchTerm = `%${query.toLowerCase()}%`;
+    
+    const results = await this.db
+      .select()
+      .from(serviceAreas)
+      .where(
+        and(
+          eq(serviceAreas.servico, serviceType),
+          or(
+            ilike(serviceAreas.endereco, searchTerm),
+            ilike(serviceAreas.bairro, searchTerm),
+            sql`CAST(${serviceAreas.lote} AS TEXT) LIKE ${searchTerm}`
+          )
+        )
+      )
+      .limit(limit);
+    
+    return results.map(this.mapDbAreaToServiceArea);
   }
 
   async updateAreaStatus(id: number, status: string): Promise<ServiceArea | undefined> {

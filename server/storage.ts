@@ -4,6 +4,7 @@ export interface IStorage {
   // Service Areas
   getAllAreas(serviceType: string): Promise<ServiceArea[]>;
   getAreaById(id: number): Promise<ServiceArea | undefined>;
+  searchAreas(query: string, serviceType: string, limit?: number): Promise<ServiceArea[]>;
   updateAreaStatus(id: number, status: string): Promise<ServiceArea | undefined>;
   updateAreaSchedule(id: number, scheduledDate: string): Promise<ServiceArea | undefined>;
   updateAreaPolygon(id: number, polygon: Array<{ lat: number; lng: number }>): Promise<ServiceArea | undefined>;
@@ -167,6 +168,23 @@ export class MemStorage implements IStorage {
 
   async getAreaById(id: number): Promise<ServiceArea | undefined> {
     return [...this.rocagemAreas, ...this.jardinsAreas].find(a => a.id === id);
+  }
+
+  async searchAreas(query: string, serviceType: string, limit: number = 50): Promise<ServiceArea[]> {
+    const areas = serviceType === "rocagem" ? this.rocagemAreas : this.jardinsAreas;
+    const searchLower = query.toLowerCase();
+    
+    const filtered = areas.filter(area => {
+      const endereco = (area.endereco || "").toLowerCase();
+      const bairro = (area.bairro || "").toLowerCase();
+      const lote = area.lote?.toString() || "";
+      
+      return endereco.includes(searchLower) || 
+             bairro.includes(searchLower) || 
+             lote.includes(searchLower);
+    });
+    
+    return filtered.slice(0, limit);
   }
 
   async updateAreaStatus(id: number, status: string): Promise<ServiceArea | undefined> {

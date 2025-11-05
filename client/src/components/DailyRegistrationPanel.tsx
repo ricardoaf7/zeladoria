@@ -41,7 +41,7 @@ export function DailyRegistrationPanel({
       });
       
       // Invalidar cache para recarregar dados
-      queryClient.invalidateQueries({ queryKey: ['/api/areas/rocagem'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/areas/light', 'rocagem'] });
       queryClient.invalidateQueries({ queryKey: ['/api/config'] });
       
       // Limpar seleção e desativar modo

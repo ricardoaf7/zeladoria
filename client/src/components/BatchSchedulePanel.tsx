@@ -35,7 +35,7 @@ export function BatchSchedulePanel({
       return await apiRequest("PATCH", "/api/areas/batch-schedule", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/areas/rocagem"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/areas/light", "rocagem"] });
       toast({
         title: "Agendamento Realizado",
         description: `${selectedCount} áreas foram agendadas com sucesso.`,

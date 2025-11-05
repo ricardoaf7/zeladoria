@@ -46,6 +46,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Novo endpoint otimizado: dados leves para mapa (sem histórico, sem detalhes pesados)
+  app.get("/api/areas/light", async (req, res) => {
+    try {
+      const servico = req.query.servico as string || "rocagem";
+      const areas = await storage.getAllAreas(servico);
+      
+      // Retornar apenas campos essenciais para o mapa
+      const lightAreas = areas.map(area => ({
+        id: area.id,
+        lat: area.lat,
+        lng: area.lng,
+        status: area.status,
+        proximaPrevisao: area.proximaPrevisao,
+        lote: area.lote,
+        servico: area.servico,
+        endereco: area.endereco,
+        bairro: area.bairro,
+      }));
+      
+      res.json(lightAreas);
+    } catch (error) {
+      console.error("Error fetching light areas:", error);
+      res.status(500).json({ error: "Failed to fetch light areas" });
+    }
+  });
+
+  // Novo endpoint: busca server-side otimizada
+  app.get("/api/areas/search", async (req, res) => {
+    try {
+      const query = (req.query.q as string || "").trim();
+      const servico = req.query.servico as string || "rocagem";
+      
+      if (!query) {
+        res.json([]);
+        return;
+      }
+      
+      // Usar método otimizado do storage que filtra direto no banco
+      const results = await storage.searchAreas(query, servico, 50);
+      
+      res.json(results);
+    } catch (error) {
+      console.error("Error searching areas:", error);
+      res.status(500).json({ error: "Failed to search areas" });
+    }
+  });
+
+  // Novo endpoint: detalhes completos de uma área específica
+  app.get("/api/areas/:id", async (req, res) => {
+    try {
+      const areaId = parseInt(req.params.id);
+      const area = await storage.getAreaById(areaId);
+      
+      if (!area) {
+        res.status(404).json({ error: "Area not found" });
+        return;
+      }
+      
+      res.json(area);
+    } catch (error) {
+      console.error("Error fetching area details:", error);
+      res.status(500).json({ error: "Failed to fetch area details" });
+    }
+  });
+
   app.get("/api/teams", async (req, res) => {
     try {
       const teams = await storage.getAllTeams();

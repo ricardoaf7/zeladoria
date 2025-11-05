@@ -42,8 +42,8 @@ export function AreaDetailsModal({ area, teams, onClose }: AreaDetailsModalProps
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/areas/rocagem"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/areas/jardins"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/areas/light", "rocagem"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/areas/light", "jardins"] });
       toast({
         title: "Serviço Iniciado",
         description: `O serviço em ${area.endereco} foi iniciado.`,
@@ -59,8 +59,8 @@ export function AreaDetailsModal({ area, teams, onClose }: AreaDetailsModalProps
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/areas/rocagem"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/areas/jardins"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/areas/light", "rocagem"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/areas/light", "jardins"] });
       toast({
         title: "Serviço Concluído",
         description: `O serviço em ${area.endereco} foi marcado como concluído.`,

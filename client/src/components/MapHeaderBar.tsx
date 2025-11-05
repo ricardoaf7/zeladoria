@@ -4,6 +4,7 @@ import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useQuery } from '@tanstack/react-query';
 import type { TimeRangeFilter } from './MapLegend';
 import type { ServiceArea } from '@shared/schema';
 
@@ -72,17 +73,20 @@ export function MapHeaderBar({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Filtrar áreas com base na busca
-  const suggestions = searchQuery.trim() 
-    ? areas.filter(area => {
-        const searchLower = searchQuery.toLowerCase();
-        return (
-          area.endereco?.toLowerCase().includes(searchLower) ||
-          area.bairro?.toLowerCase().includes(searchLower) ||
-          area.lote?.toString().includes(searchLower)
-        );
-      }).slice(0, 8) // Mostrar no máximo 8 sugestões
-    : [];
+  // Busca server-side com debounce
+  const { data: searchResults = [] } = useQuery<ServiceArea[]>({
+    queryKey: ['/api/areas/search', searchQuery],
+    queryFn: async () => {
+      if (!searchQuery.trim()) return [];
+      const res = await fetch(`/api/areas/search?q=${encodeURIComponent(searchQuery)}&servico=rocagem`);
+      if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: searchQuery.trim().length > 0,
+    staleTime: 30000, // Cache por 30 segundos
+  });
+
+  const suggestions = searchResults.slice(0, 8); // Mostrar no máximo 8 sugestões
 
   // Fechar dropdown quando clicar fora
   useEffect(() => {

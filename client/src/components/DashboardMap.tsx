@@ -61,7 +61,7 @@ export function DashboardMap({
       return await apiRequest("PATCH", `/api/areas/${areaId}/position`, { lat, lng });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/areas/rocagem"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/areas/light", "rocagem"] });
       toast({
         title: "Posição Atualizada",
         description: "A posição do marcador foi atualizada com sucesso.",

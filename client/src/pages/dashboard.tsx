@@ -43,12 +43,23 @@ export default function Dashboard() {
     // Deixar o usuário controlar via botão Menu
   };
 
+  // Usar endpoint otimizado com dados leves para o mapa
   const { data: rocagemAreas = [] } = useQuery<ServiceArea[]>({
-    queryKey: ["/api/areas/rocagem"],
+    queryKey: ["/api/areas/light", "rocagem"],
+    queryFn: async () => {
+      const res = await fetch("/api/areas/light?servico=rocagem");
+      if (!res.ok) throw new Error("Failed to fetch areas");
+      return res.json();
+    },
   });
 
   const { data: jardinsAreas = [] } = useQuery<ServiceArea[]>({
-    queryKey: ["/api/areas/jardins"],
+    queryKey: ["/api/areas/light", "jardins"],
+    queryFn: async () => {
+      const res = await fetch("/api/areas/light?servico=jardins");
+      if (!res.ok) throw new Error("Failed to fetch areas");
+      return res.json();
+    },
   });
 
   const { data: config } = useQuery<AppConfig>({

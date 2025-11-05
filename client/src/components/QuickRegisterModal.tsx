@@ -97,11 +97,11 @@ export function QuickRegisterModal({ area, open, onOpenChange }: QuickRegisterMo
       return await res.json() as ServiceArea;
     },
     onSuccess: (updatedArea) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/areas/rocagem"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/areas/jardins"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/areas/light", "rocagem"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/areas/light", "jardins"] });
       
       // Atualizar área no cache imediatamente para reflexão instantânea na UI
-      queryClient.setQueryData(["/api/areas/rocagem"], (old: ServiceArea[] | undefined) => {
+      queryClient.setQueryData(["/api/areas/light", "rocagem"], (old: ServiceArea[] | undefined) => {
         if (!old) return old;
         return old.map(a => a.id === updatedArea.id ? updatedArea : a);
       });
