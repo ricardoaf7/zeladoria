@@ -1,10 +1,13 @@
 /**
  * Algoritmo de cálculo automático de previsão de roçagem
- * Considera produção diária por lote e dias úteis (exclui fins de semana e feriados)
+ * Ciclo fixo de 45 dias entre roçagens
+ * Próxima roçagem = Última roçagem + 45 dias
  */
 
 import { addBusinessDays, isBusinessDay } from './holidays';
 import type { ServiceArea, AppConfig } from './schema';
+
+const MOWING_CYCLE_DAYS = 45;
 
 export interface ScheduleCalculationResult {
   areaId: number;
@@ -13,12 +16,47 @@ export interface ScheduleCalculationResult {
 }
 
 /**
+ * Calcula a próxima previsão de roçagem para uma área
+ * Ciclo fixo: próxima roçagem = última roçagem + 45 dias
+ * Se nunca foi roçada, usa a data atual
+ * @param area Área para calcular
+ * @returns Resultado do cálculo
+ */
+export function calculateNextMowing(area: ServiceArea): ScheduleCalculationResult | null {
+  // Se tem agendamento manual, não calcula automaticamente
+  if (area.manualSchedule) {
+    return null;
+  }
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  let nextMowingDate: Date;
+  
+  if (area.ultimaRocagem) {
+    // Se já foi roçada, próxima = última + 45 dias
+    const lastMowing = new Date(area.ultimaRocagem);
+    lastMowing.setHours(0, 0, 0, 0);
+    nextMowingDate = new Date(lastMowing);
+    nextMowingDate.setDate(lastMowing.getDate() + MOWING_CYCLE_DAYS);
+  } else {
+    // Se nunca foi roçada, agenda para hoje
+    nextMowingDate = new Date(today);
+  }
+  
+  return {
+    areaId: area.id,
+    proximaPrevisao: formatDate(nextMowingDate),
+    daysToComplete: 1,
+  };
+}
+
+/**
  * Calcula a próxima previsão de roçagem para todas as áreas de um lote
- * Usa sequência de cadastro e lógica de fila
  * @param areas Todas as áreas do lote
  * @param lote Número do lote (1 ou 2)
- * @param productionRate Taxa de produção em m²/dia
- * @param startDate Data de início do cálculo (hoje ou data futura)
+ * @param productionRate Taxa de produção em m²/dia (não usado no novo algoritmo)
+ * @param startDate Data de início do cálculo (não usado no novo algoritmo)
  * @returns Lista de previsões calculadas
  */
 export function calculateMowingSchedule(
@@ -27,67 +65,18 @@ export function calculateMowingSchedule(
   productionRate: number,
   startDate: Date = new Date()
 ): ScheduleCalculationResult[] {
-  // Filtrar apenas áreas do lote especificado que não estão em agendamento manual
+  // Filtrar apenas áreas do lote especificado
   const loteAreas = areas.filter(a => 
     a.lote === lote && 
-    a.servico === 'rocagem' && 
-    !a.manualSchedule
+    a.servico === 'rocagem'
   );
-  
-  // Ordenar por sequenciaCadastro (sequência de registro), depois por ordem, depois por ID
-  const sortedAreas = loteAreas.sort((a, b) => {
-    // Prioridade 1: sequenciaCadastro
-    if (a.sequenciaCadastro !== undefined && a.sequenciaCadastro !== null && 
-        b.sequenciaCadastro !== undefined && b.sequenciaCadastro !== null) {
-      return a.sequenciaCadastro - b.sequenciaCadastro;
-    }
-    
-    // Prioridade 2: ordem
-    if (a.ordem !== undefined && a.ordem !== null && 
-        b.ordem !== undefined && b.ordem !== null) {
-      return a.ordem - b.ordem;
-    }
-    
-    // Prioridade 3: ID (fallback)
-    return a.id - b.id;
-  });
   
   const results: ScheduleCalculationResult[] = [];
   
-  // Normalizar data de início para início do dia
-  const currentDate = new Date(startDate);
-  currentDate.setHours(0, 0, 0, 0);
-  
-  // Garantir que começamos em um dia útil
-  let schedulingDate = new Date(currentDate);
-  while (!isBusinessDay(schedulingDate)) {
-    schedulingDate.setDate(schedulingDate.getDate() + 1);
-  }
-  
-  for (const area of sortedAreas) {
-    // Calcular dias necessários para completar essa área
-    const areaSize = area.metragem_m2 || 1000; // default 1000m² se não especificado
-    const daysNeeded = Math.ceil(areaSize / productionRate);
-    
-    // Registrar data de início prevista
-    const startDateStr = formatDate(schedulingDate);
-    
-    // Adicionar dias úteis necessários
-    const endDate = addBusinessDays(schedulingDate, daysNeeded - 1);
-    
-    results.push({
-      areaId: area.id,
-      proximaPrevisao: startDateStr,
-      daysToComplete: daysNeeded,
-    });
-    
-    // Próxima área começa no dia seguinte (útil) após o término
-    schedulingDate = new Date(endDate);
-    schedulingDate.setDate(schedulingDate.getDate() + 1);
-    
-    // Garantir que é dia útil
-    while (!isBusinessDay(schedulingDate)) {
-      schedulingDate.setDate(schedulingDate.getDate() + 1);
+  for (const area of loteAreas) {
+    const result = calculateNextMowing(area);
+    if (result) {
+      results.push(result);
     }
   }
   
