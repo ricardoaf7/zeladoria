@@ -37,7 +37,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Storage
 
-**Storage Architecture**: Dual-mode system, automatically switching between in-memory (`MemStorage`) for development and PostgreSQL (`DbStorage`) for production based on the `DATABASE_URL` environment variable.
+**Storage Architecture**: Dual-mode system, automatically switching between in-memory (`MemStorage`) for development and PostgreSQL (`DbStorage`) for production based on the `DATABASE_URL` environment variable. **Important**: Development and production environments share the same PostgreSQL database (Neon) - data imported or modified in development is immediately available in production.
 **Storage Interface**: `IStorage` provides a unified abstraction for CRUD operations on service areas, team management, configuration, and history tracking.
 **Database Schema**: Defined in `db/schema.ts` for `service_areas` (geographic data, scheduling, history via JSONB, audit fields), `teams` (real-time location), and `app_config` (mowing production rates).
 **Data Models**: TypeScript types (`shared/schema.ts`) for `ServiceArea` (status, scheduling, history, forecast, audit), `Team` (type, status, assignment, location), and `AppConfig`.
