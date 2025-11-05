@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { 
   MapPin, 
   Layers, 
@@ -31,7 +31,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { AreaInfoCard } from "./AreaInfoCard";
-import { type TimeRangeFilter } from "./MapLegend";
 import { Separator } from "@/components/ui/separator";
 import type { ServiceArea } from "@shared/schema";
 
@@ -41,15 +40,7 @@ interface AppSidebarProps {
   selectedArea?: ServiceArea | null;
   onAreaClose?: () => void;
   onAreaUpdate?: (area: ServiceArea) => void;
-  selectionMode?: boolean;
-  onToggleSelectionMode?: () => void;
-  isRegistrationMode?: boolean;
-  onRegistrationModeChange?: (isActive: boolean) => void;
-  selectedAreaIds?: Set<number>;
-  onClearSelection?: () => void;
-  rocagemAreas?: ServiceArea[];
   standalone?: boolean;
-  onTimeRangeFilterChange?: (filter: TimeRangeFilter, customDateRange?: { from: Date | undefined; to: Date | undefined }) => void;
   showQuickRegisterModal?: boolean;
   showMapCard?: boolean;
 }
@@ -60,31 +51,11 @@ export function AppSidebar({
   selectedArea,
   onAreaClose,
   onAreaUpdate,
-  selectionMode = false,
-  onToggleSelectionMode,
-  isRegistrationMode = false,
-  onRegistrationModeChange,
-  selectedAreaIds = new Set(),
-  onClearSelection,
-  rocagemAreas = [],
   standalone = false,
-  onTimeRangeFilterChange,
   showQuickRegisterModal = false,
   showMapCard = false,
 }: AppSidebarProps) {
   const { theme } = useTheme();
-  const [activeTimeFilter, setActiveTimeFilter] = useState<TimeRangeFilter>(null);
-  const [customDateRange, setCustomDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
-  
-  // Limpar filtro ao desselecionar roçagem
-  useEffect(() => {
-    if (selectedService !== 'rocagem') {
-      setActiveTimeFilter(null);
-      if (onTimeRangeFilterChange) {
-        onTimeRangeFilterChange(null, undefined);
-      }
-    }
-  }, [selectedService]);
 
   const handleServiceClick = (service: string) => {
     if (onServiceSelect) {
@@ -93,31 +64,6 @@ export function AppSidebar({
         onServiceSelect('');
       } else {
         onServiceSelect(service);
-      }
-    }
-  };
-
-  const handleTimeFilterChange = (filter: TimeRangeFilter) => {
-    setActiveTimeFilter(filter);
-    if (onTimeRangeFilterChange) {
-      // Para filtros não-custom, passar undefined como range
-      // Para filtro custom, passar o range armazenado
-      const rangeToPass = filter === 'custom' ? customDateRange : undefined;
-      onTimeRangeFilterChange(filter, rangeToPass);
-    }
-  };
-
-  const handleCustomDateRangeChange = (range: { from: Date | undefined; to: Date | undefined }) => {
-    setCustomDateRange(range);
-    // Quando um range completo é selecionado, ativar o filtro 'custom' automaticamente
-    if (onTimeRangeFilterChange && range.from && range.to) {
-      setActiveTimeFilter('custom');
-      onTimeRangeFilterChange('custom', range);
-    } else if (onTimeRangeFilterChange && (!range.from || !range.to)) {
-      // Se o range está incompleto e custom estava ativo, desativar
-      if (activeTimeFilter === 'custom') {
-        setActiveTimeFilter(null);
-        onTimeRangeFilterChange(null, undefined);
       }
     }
   };
@@ -135,7 +81,7 @@ export function AppSidebar({
 
   const content = (
     <>
-        {selectedArea && onAreaClose && !isRegistrationMode && !showQuickRegisterModal && !showMapCard ? (
+        {selectedArea && onAreaClose && !showQuickRegisterModal && !showMapCard ? (
           <div className="mb-4">
             <AreaInfoCard 
               area={selectedArea} 

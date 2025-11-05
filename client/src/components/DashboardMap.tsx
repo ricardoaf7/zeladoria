@@ -19,8 +19,6 @@ interface DashboardMapProps {
   };
   onAreaClick: (area: ServiceArea) => void;
   mapRef?: React.MutableRefObject<L.Map | null>;
-  selectionMode?: boolean;
-  selectedAreaIds?: Set<number>;
   filteredAreaIds?: Set<number>;
   searchQuery?: string;
   activeFilter?: TimeRangeFilter;
@@ -33,8 +31,6 @@ export function DashboardMap({
   layerFilters,
   onAreaClick,
   mapRef: externalMapRef,
-  selectionMode = false,
-  selectedAreaIds = new Set(),
   filteredAreaIds,
   searchQuery = '',
   activeFilter = null,
@@ -200,7 +196,6 @@ export function DashboardMap({
 
       if (!layerGroup) return;
 
-      const isSelected = selectedAreaIds.has(area.id);
       const isFiltered = filteredAreaIds ? filteredAreaIds.has(area.id) : true;
       
       // Se há filtro ativo e área não está filtrada, não renderizar
@@ -208,7 +203,7 @@ export function DashboardMap({
         return;
       }
 
-      const color = getAreaColor(area, today, isSelected, activeFilter);
+      const color = getAreaColor(area, today, false, activeFilter);
       const isPulsing = area.status === "Em Execução";
 
       // Criar um ícone div circular arrastável
@@ -302,7 +297,7 @@ export function DashboardMap({
 
       marker.addTo(layerGroup);
     });
-  }, [rocagemAreas, onAreaClick, selectedAreaIds, filteredAreaIds, searchQuery]);
+  }, [rocagemAreas, onAreaClick, filteredAreaIds, searchQuery]);
 
   useEffect(() => {
     if (!mapRef.current) return;

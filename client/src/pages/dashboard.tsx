@@ -24,9 +24,6 @@ export default function Dashboard() {
   const [showMapCard, setShowMapCard] = useState(false);
   const [showQuickRegisterModal, setShowQuickRegisterModal] = useState(false);
   const [selectedService, setSelectedService] = useState<string>('');
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [isRegistrationMode, setIsRegistrationMode] = useState(false);
-  const [selectedAreaIds, setSelectedAreaIds] = useState<Set<number>>(new Set());
   const [bottomSheetState, setBottomSheetState] = useState<BottomSheetState>("minimized");
   const [filters, setFilters] = useState<FilterCriteria>({
     search: "",
@@ -222,20 +219,8 @@ export default function Dashboard() {
   } as React.CSSProperties;
 
   const handleAreaClick = (area: ServiceArea) => {
-    if (selectionMode) {
-      setSelectedAreaIds(prev => {
-        const newSet = new Set(prev);
-        if (newSet.has(area.id)) {
-          newSet.delete(area.id);
-        } else {
-          newSet.add(area.id);
-        }
-        return newSet;
-      });
-    } else {
-      setSelectedArea(area);
-      setShowMapCard(true); // Mostrar card flutuante no mapa
-    }
+    setSelectedArea(area);
+    setShowMapCard(true); // Mostrar card flutuante no mapa
   };
 
   const handleCloseMapCard = () => {
@@ -250,28 +235,6 @@ export default function Dashboard() {
 
   const handleAreaUpdate = (updatedArea: ServiceArea) => {
     setSelectedArea(updatedArea);
-  };
-
-  const handleToggleSelectionMode = () => {
-    setSelectionMode(prev => !prev);
-    if (selectionMode) {
-      setSelectedAreaIds(new Set());
-    }
-    setSelectedArea(null);
-    setIsRegistrationMode(false);
-  };
-
-  const handleRegistrationModeChange = (isActive: boolean) => {
-    setIsRegistrationMode(isActive);
-    setSelectionMode(isActive);
-    if (!isActive) {
-      setSelectedAreaIds(new Set());
-    }
-    setSelectedArea(null);
-  };
-
-  const handleClearSelection = () => {
-    setSelectedAreaIds(new Set());
   };
 
   const handleTimeRangeFilterChange = (filter: TimeRangeFilter, customDateRange?: { from: Date | undefined; to: Date | undefined }) => {
@@ -364,8 +327,6 @@ export default function Dashboard() {
             onAreaClick={handleAreaClick}
             filteredAreaIds={hasActiveFilters ? new Set(filteredRocagemAreas.map(a => a.id)) : undefined}
             mapRef={mapRef}
-            selectionMode={selectionMode}
-            selectedAreaIds={selectedAreaIds}
             searchQuery={filters.search}
             activeFilter={timeRangeFilter}
           />
@@ -392,14 +353,6 @@ export default function Dashboard() {
               selectedArea={selectedArea}
               onAreaClose={() => setSelectedArea(null)}
               onAreaUpdate={handleAreaUpdate}
-              selectionMode={selectionMode}
-              onToggleSelectionMode={handleToggleSelectionMode}
-              isRegistrationMode={isRegistrationMode}
-              onRegistrationModeChange={handleRegistrationModeChange}
-              selectedAreaIds={selectedAreaIds}
-              onClearSelection={handleClearSelection}
-              rocagemAreas={rocagemAreas}
-              onTimeRangeFilterChange={handleTimeRangeFilterChange}
               showQuickRegisterModal={showQuickRegisterModal}
               showMapCard={showMapCard}
             />
@@ -429,14 +382,6 @@ export default function Dashboard() {
           selectedArea={selectedArea}
           onAreaClose={() => setSelectedArea(null)}
           onAreaUpdate={handleAreaUpdate}
-          selectionMode={selectionMode}
-          onToggleSelectionMode={handleToggleSelectionMode}
-          isRegistrationMode={isRegistrationMode}
-          onRegistrationModeChange={handleRegistrationModeChange}
-          selectedAreaIds={selectedAreaIds}
-          onClearSelection={handleClearSelection}
-          rocagemAreas={rocagemAreas}
-          onTimeRangeFilterChange={handleTimeRangeFilterChange}
           showQuickRegisterModal={showQuickRegisterModal}
           showMapCard={showMapCard}
         />
@@ -485,8 +430,6 @@ export default function Dashboard() {
               filteredAreaIds={hasActiveFilters ? new Set(filteredRocagemAreas.map(a => a.id)) : undefined}
               searchQuery={filters.search}
               mapRef={mapRef}
-              selectionMode={selectionMode}
-              selectedAreaIds={selectedAreaIds}
               activeFilter={timeRangeFilter}
             />
 
