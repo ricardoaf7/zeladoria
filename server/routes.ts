@@ -566,33 +566,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tipo: row['Tipo de Item'] || row['tipo_item'] || 'Área de Roçagem',
           endereco: row['Endereço'] || row['endereco'] || '',
           bairro: row['Bairro'] || row['bairro'] || '',
-          metragem,
+          metragem_m2: metragem,
           lat,
           lng,
           lote,
           servico: 'rocagem',
           status: 'Pendente',
           proximaPrevisao: calculateNextForecast(lote, metragem),
-          observacoes: row['Observações'] || row['observacoes'] || ''
+          observacoes: row['Observações'] || row['observacoes'] || '',
+          history: [],
+          polygon: null,
+          scheduledDate: null,
+          manualSchedule: false
         });
       }
       
       console.log(`✅ ${areas.length} áreas processadas do CSV`);
       
-      // 4. Importar em lotes
+      // 4. Importar usando Drizzle diretamente
+      const { drizzle } = await import("drizzle-orm/neon-serverless");
+      const { Pool, neonConfig } = await import("@neondatabase/serverless");
+      const ws = await import("ws");
+      const { serviceAreas } = await import("../db/schema");
+      
+      neonConfig.webSocketConstructor = ws.default;
+      
+      const connectionString = process.env.DATABASE_URL;
+      if (!connectionString) {
+        throw new Error("DATABASE_URL não configurada");
+      }
+      
+      const pool = new Pool({ connectionString });
+      const db = drizzle(pool);
+      
       const batchSize = 100;
       let imported = 0;
       
       for (let i = 0; i < areas.length; i += batchSize) {
         const batch = areas.slice(i, i + batchSize);
-        
-        for (const area of batch) {
-          await storage.createArea(area);
-          imported++;
-        }
-        
+        await db.insert(serviceAreas).values(batch);
+        imported += batch.length;
         console.log(`📦 Importados ${imported}/${areas.length} registros...`);
       }
+      
+      await pool.end();
       
       console.log(`🎉 Importação concluída! Total: ${imported} áreas`);
       
