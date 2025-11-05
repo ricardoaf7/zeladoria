@@ -4,6 +4,7 @@ import { z } from "zod";
 export const serviceAreaSchema = z.object({
   id: z.number(),
   ordem: z.number().optional(),
+  sequenciaCadastro: z.number().optional(),
   tipo: z.string(),
   endereco: z.string(),
   bairro: z.string().optional(),

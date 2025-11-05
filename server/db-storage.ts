@@ -161,8 +161,8 @@ export class DbStorage implements IStorage {
     if (results.length === 0) {
       const defaultConfig = {
         mowingProductionRate: {
-          lote1: 25000,
-          lote2: 20000,
+          lote1: 85000,
+          lote2: 70000,
         },
       };
       
@@ -286,6 +286,7 @@ export class DbStorage implements IStorage {
     return {
       id: dbArea.id,
       ordem: dbArea.ordem,
+      sequenciaCadastro: dbArea.sequencia_cadastro,
       tipo: dbArea.tipo,
       endereco: dbArea.endereco,
       bairro: dbArea.bairro,

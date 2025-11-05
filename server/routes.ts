@@ -202,10 +202,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const data = updateSchema.parse(req.body);
+      
+      // Aplicar atualizações de campos primeiro (status, lote, etc.)
       const updatedArea = await storage.updateArea(areaId, data);
-
+      
       if (!updatedArea) {
         res.status(404).json({ error: "Area not found" });
+        return;
+      }
+      
+      // Se ultimaRocagem foi atualizado, recalcular previsões de todo o lote
+      if (data.ultimaRocagem) {
+        await storage.registerDailyMowing([areaId], data.ultimaRocagem, 'completed');
+        
+        // Buscar área novamente após recálculo
+        const reloadedArea = await storage.getAreaById(areaId);
+        if (!reloadedArea) {
+          res.status(404).json({ error: "Area not found after recalculation" });
+          return;
+        }
+        
+        res.json(reloadedArea);
         return;
       }
 

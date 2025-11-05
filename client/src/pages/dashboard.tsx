@@ -313,6 +313,7 @@ export default function Dashboard() {
             selectionMode={selectionMode}
             selectedAreaIds={selectedAreaIds}
             searchQuery={filters.search}
+            activeFilter={timeRangeFilter}
           />
 
           {/* Card flutuante no mapa */}
@@ -427,6 +428,7 @@ export default function Dashboard() {
               mapRef={mapRef}
               selectionMode={selectionMode}
               selectedAreaIds={selectedAreaIds}
+              activeFilter={timeRangeFilter}
             />
 
             {/* Card flutuante no mapa */}

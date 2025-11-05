@@ -25,8 +25,8 @@ async function seed() {
   // Inserir configuração
   await db.insert(appConfig).values({
     mowingProductionRate: {
-      lote1: 25000,
-      lote2: 20000,
+      lote1: 85000,
+      lote2: 70000,
     },
   });
   console.log("✅ Configuração inserida");

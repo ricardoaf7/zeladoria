@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { formatDateBR } from "@/lib/utils";
 import { MapLayerControl, type MapLayerType } from "./MapLayerControl";
 import type { ServiceArea } from "@shared/schema";
+import type { TimeRangeFilter } from "./MapLegend";
 
 interface DashboardMapProps {
   rocagemAreas: ServiceArea[];
@@ -22,6 +23,7 @@ interface DashboardMapProps {
   selectedAreaIds?: Set<number>;
   filteredAreaIds?: Set<number>;
   searchQuery?: string;
+  activeFilter?: TimeRangeFilter;
 }
 
 export function DashboardMap({
@@ -34,6 +36,7 @@ export function DashboardMap({
   selectedAreaIds = new Set(),
   filteredAreaIds,
   searchQuery = '',
+  activeFilter = null,
 }: DashboardMapProps) {
   const { toast } = useToast();
   const internalMapRef = useRef<L.Map | null>(null);
@@ -184,7 +187,7 @@ export function DashboardMap({
         return;
       }
 
-      const color = getAreaColor(area, today, isSelected);
+      const color = getAreaColor(area, today, isSelected, activeFilter);
       const isPulsing = area.status === "Em Execução";
 
       // Criar um ícone div circular arrastável
@@ -319,7 +322,7 @@ export function DashboardMap({
   );
 }
 
-function getAreaColor(area: ServiceArea, today: Date, isSelected = false): string {
+function getAreaColor(area: ServiceArea, today: Date, isSelected = false, activeFilter: TimeRangeFilter = null): string {
   if (isSelected) {
     return "#9333ea"; // Roxo para selecionado
   }
@@ -357,12 +360,16 @@ function getAreaColor(area: ServiceArea, today: Date, isSelected = false): strin
     else if (daysUntilMowing > 40 && daysUntilMowing <= 45) {
       return "#ef4444";
     }
-    // Fora das categorias definidas - cinza
+    // Fora das categorias definidas
+    // Quando filtro "Todas" ativo (null), usar cor laranja
+    // Quando filtro específico ativo, usar cinza
     else {
-      return "#9ca3af";
+      return activeFilter === null ? "#fe8963" : "#9ca3af";
     }
   }
 
-  // Sem previsão - cinza
-  return "#9ca3af";
+  // Sem previsão
+  // Quando filtro "Todas" ativo (null), usar cor laranja
+  // Quando filtro específico ativo, usar cinza
+  return activeFilter === null ? "#fe8963" : "#9ca3af";
 }

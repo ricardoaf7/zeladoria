@@ -3,6 +3,7 @@ import { pgTable, serial, text, integer, jsonb, boolean, timestamp, doublePrecis
 export const serviceAreas = pgTable("service_areas", {
   id: serial("id").primaryKey(),
   ordem: integer("ordem"),
+  sequenciaCadastro: integer("sequencia_cadastro"),
   tipo: text("tipo").notNull(),
   endereco: text("endereco").notNull(),
   bairro: text("bairro"),

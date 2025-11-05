@@ -14,6 +14,7 @@ export interface ScheduleCalculationResult {
 
 /**
  * Calcula a próxima previsão de roçagem para todas as áreas de um lote
+ * Usa sequência de cadastro e lógica de fila
  * @param areas Todas as áreas do lote
  * @param lote Número do lote (1 ou 2)
  * @param productionRate Taxa de produção em m²/dia
@@ -33,12 +34,21 @@ export function calculateMowingSchedule(
     !a.manualSchedule
   );
   
-  // Ordenar por ordem (se existir) ou por ID
+  // Ordenar por sequenciaCadastro (sequência de registro), depois por ordem, depois por ID
   const sortedAreas = loteAreas.sort((a, b) => {
+    // Prioridade 1: sequenciaCadastro
+    if (a.sequenciaCadastro !== undefined && a.sequenciaCadastro !== null && 
+        b.sequenciaCadastro !== undefined && b.sequenciaCadastro !== null) {
+      return a.sequenciaCadastro - b.sequenciaCadastro;
+    }
+    
+    // Prioridade 2: ordem
     if (a.ordem !== undefined && a.ordem !== null && 
         b.ordem !== undefined && b.ordem !== null) {
       return a.ordem - b.ordem;
     }
+    
+    // Prioridade 3: ID (fallback)
     return a.id - b.id;
   });
   
