@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useDeferredValue } from 'react';
+import { useState, useRef, useEffect, useDeferredValue, startTransition } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -67,11 +67,21 @@ export function MapHeaderBar({
   areas = [],
   onAreaSelect,
 }: MapHeaderBarProps) {
+  // OTIMIZAÇÃO CRÍTICA: Estado local para input instantâneo
+  // Separar estado visual (localValue) da propagação ao dashboard (onSearchChange)
+  // Elimina lag de 3-4 segundos na digitação causado por re-render do dashboard
+  const [localValue, setLocalValue] = useState(searchQuery);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [dropdownPosition, setDropdownPosition] = useState<{top: number; left: number; width: number} | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sincronizar localValue quando searchQuery mudar externamente (ex: limpar busca)
+  useEffect(() => {
+    setLocalValue(searchQuery);
+  }, [searchQuery]);
 
   // OTIMIZAÇÃO: Debounce automático com useDeferredValue (200ms típico)
   // Evita lag na digitação, separando input visual da busca server-side
@@ -108,11 +118,38 @@ export function MapHeaderBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Handler de mudança com debounce e transição de baixa prioridade
+  const handleInputChange = (value: string) => {
+    // 1. Atualizar input IMEDIATAMENTE (sem esperar nada)
+    setLocalValue(value);
+    
+    // 2. Cancelar debounce anterior
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    // 3. Propagar ao dashboard após 300ms, em transição de baixa prioridade
+    debounceTimerRef.current = setTimeout(() => {
+      startTransition(() => {
+        onSearchChange(value);
+      });
+    }, 300);
+  };
+
+  // Cleanup do timer
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
   // Mostrar sugestões quando há busca e resultados
   useEffect(() => {
-    setShowSuggestions(searchQuery.trim().length > 0 && suggestions.length > 0);
+    setShowSuggestions(localValue.trim().length > 0 && suggestions.length > 0);
     setSelectedIndex(-1);
-  }, [searchQuery, suggestions.length]);
+  }, [localValue, suggestions.length]);
 
   // Calcular posição do dropdown
   useEffect(() => {
@@ -134,9 +171,28 @@ export function MapHeaderBar({
 
   const handleSuggestionClick = (area: ServiceArea) => {
     onAreaSelect?.(area);
+    setLocalValue('');
+    
+    // Limpar debounce pendente e propagar limpeza imediatamente
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
     onSearchChange('');
+    
     setShowSuggestions(false);
     inputRef.current?.blur();
+  };
+
+  const handleClearSearch = () => {
+    setLocalValue('');
+    
+    // Limpar debounce pendente e propagar limpeza imediatamente
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    onSearchChange('');
+    
+    setShowSuggestions(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -183,19 +239,16 @@ export function MapHeaderBar({
             ref={inputRef}
             type="text"
             placeholder="Buscar por endereço ou bairro..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={localValue}
+            onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
             className="pl-9 pr-9 h-9 text-sm"
             data-testid="input-search-areas"
             autoComplete="off"
           />
-          {searchQuery && (
+          {localValue && (
             <button
-              onClick={() => {
-                onSearchChange('');
-                setShowSuggestions(false);
-              }}
+              onClick={handleClearSearch}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground z-10"
               data-testid="button-clear-search"
             >
@@ -230,15 +283,15 @@ export function MapHeaderBar({
                   data-testid={`suggestion-${area.id}`}
                 >
                   <div className="font-medium">
-                    {highlightMatch(area.endereco || 'Sem endereço', searchQuery)}
+                    {highlightMatch(area.endereco || 'Sem endereço', localValue)}
                   </div>
                   <div className="text-xs text-muted-foreground mt-0.5">
                     {area.bairro && (
-                      <span>{highlightMatch(area.bairro, searchQuery)}</span>
+                      <span>{highlightMatch(area.bairro, localValue)}</span>
                     )}
                     {area.lote && (
                       <span className="ml-2">
-                        Lote: {highlightMatch(area.lote.toString(), searchQuery)}
+                        Lote: {highlightMatch(area.lote.toString(), localValue)}
                       </span>
                     )}
                     {area.metragem_m2 && (
