@@ -9,9 +9,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, CheckCircle2 } from "lucide-react";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import type { ServiceArea } from "@shared/schema";
@@ -28,13 +29,40 @@ interface QuickRegisterModalProps {
 export function QuickRegisterModal({ area, open, onOpenChange }: QuickRegisterModalProps) {
   const { toast } = useToast();
   const [date, setDate] = useState<Date>(new Date());
+  const [inputValue, setInputValue] = useState<string>("");
 
   // Resetar data para hoje quando modal fechar
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       setDate(new Date()); // Reset para hoje ao fechar
+      setInputValue(""); // Limpar input
     }
     onOpenChange(newOpen);
+  };
+
+  // Atualizar input quando data muda via calendário
+  const handleDateSelect = (newDate: Date | undefined) => {
+    if (newDate) {
+      setDate(newDate);
+      setInputValue(format(newDate, "dd/MM/yyyy"));
+    }
+  };
+
+  // Processar entrada manual de data
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+    
+    // Tentar parsear a data (formato dd/MM/yyyy)
+    if (value.length === 10) {
+      try {
+        const parsedDate = parse(value, "dd/MM/yyyy", new Date());
+        if (!isNaN(parsedDate.getTime())) {
+          setDate(parsedDate);
+        }
+      } catch (e) {
+        // Ignora erro de parse
+      }
+    }
   };
 
   const registerMowingMutation = useMutation({
@@ -91,34 +119,47 @@ export function QuickRegisterModal({ area, open, onOpenChange }: QuickRegisterMo
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="date-picker">Data da Roçagem</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  id="date-picker"
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal h-10",
-                    !date && "text-muted-foreground"
-                  )}
-                  data-testid="button-date-picker"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecione a data"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(newDate) => newDate && setDate(newDate)}
-                  initialFocus
-                  locale={ptBR}
-                />
-              </PopoverContent>
-            </Popover>
+            <Label htmlFor="date-input">Data da Roçagem</Label>
+            
+            {/* Input manual de data */}
+            <div className="relative">
+              <Input
+                id="date-input"
+                type="text"
+                placeholder="dd/mm/aaaa"
+                value={inputValue || format(date, "dd/MM/yyyy")}
+                onChange={(e) => handleInputChange(e.target.value)}
+                className="pr-10"
+                data-testid="input-date-manual"
+              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full"
+                    data-testid="button-date-picker"
+                  >
+                    <CalendarIcon className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 z-[9999]" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={handleDateSelect}
+                    initialFocus
+                    locale={ptBR}
+                    captionLayout="dropdown-buttons"
+                    fromYear={2020}
+                    toYear={2030}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
             <p className="text-xs text-muted-foreground">
-              Padrão: hoje ({format(new Date(), "dd/MM/yyyy")})
+              Digite manualmente ou clique no calendário. Padrão: hoje ({format(new Date(), "dd/MM/yyyy")})
             </p>
           </div>
         </div>
