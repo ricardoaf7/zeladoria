@@ -115,6 +115,13 @@ export class DbStorage implements IStorage {
     if (data.proximaPrevisao !== undefined) updateData.proximaPrevisao = data.proximaPrevisao;
     if (data.polygon !== undefined) updateData.polygon = data.polygon;
     if (data.history !== undefined) updateData.history = data.history;
+    if (data.registradoPor !== undefined) updateData.registradoPor = data.registradoPor;
+    if (data.dataRegistro !== undefined) {
+      // Converter string ISO para Date object para o campo timestamp no banco
+      updateData.dataRegistro = typeof data.dataRegistro === 'string' 
+        ? new Date(data.dataRegistro) 
+        : data.dataRegistro;
+    }
     
     const results = await this.db
       .update(serviceAreas)
@@ -324,6 +331,8 @@ export class DbStorage implements IStorage {
       manualSchedule: dbArea.manualSchedule ?? false,
       daysToComplete: dbArea.daysToComplete,
       servico: dbArea.servico,
+      registradoPor: dbArea.registradoPor || null,
+      dataRegistro: dbArea.dataRegistro ? dbArea.dataRegistro.toISOString() : null,
     };
   }
 
