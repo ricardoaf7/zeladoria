@@ -108,16 +108,33 @@ export function QuickRegisterModal({ area, open, onOpenChange }: QuickRegisterMo
     }
     
     try {
-      const parsedDate = parse(inputValue, "dd/MM/yyyy", new Date());
+      let dateStr = inputValue;
+      
+      // Se ano tem apenas 2 dígitos (formato dd/MM/yy), completar para 4
+      if (inputValue.length === 8) { // dd/MM/yy
+        const parts = inputValue.split('/');
+        if (parts.length === 3 && parts[2].length === 2) {
+          const year = parseInt(parts[2]);
+          const fullYear = year < 50 ? 2000 + year : 1900 + year;
+          dateStr = `${parts[0]}/${parts[1]}/${fullYear}`;
+        }
+      }
+      
+      const parsedDate = parse(dateStr, "dd/MM/yyyy", new Date());
       if (!isNaN(parsedDate.getTime())) {
         setDate(parsedDate);
         setInputValue(format(parsedDate, "dd/MM/yyyy"));
       } else {
-        // Data inválida, resetar para data atual
-        setInputValue(format(date, "dd/MM/yyyy"));
+        // Data inválida ou incompleta, resetar para HOJE
+        const today = new Date();
+        setDate(today);
+        setInputValue(format(today, "dd/MM/yyyy"));
       }
     } catch (e) {
-      setInputValue(format(date, "dd/MM/yyyy"));
+      // Erro no parse, resetar para HOJE
+      const today = new Date();
+      setDate(today);
+      setInputValue(format(today, "dd/MM/yyyy"));
     }
   };
 
@@ -132,16 +149,20 @@ export function QuickRegisterModal({ area, open, onOpenChange }: QuickRegisterMo
       return await res.json() as ServiceArea;
     },
     onSuccess: (updatedArea) => {
-      // OTIMIZAÇÃO CRÍTICA: Não invalidar queries pesadas (1128 áreas)
-      // Apenas atualizar o cache localmente para resposta instantânea
+      if (!area) return; // Safety check
+      
+      // Atualizar cache de áreas leves
       queryClient.setQueryData(["/api/areas/light", "rocagem"], (old: ServiceArea[] | undefined) => {
         if (!old) return old;
         return old.map(a => a.id === updatedArea.id ? updatedArea : a);
       });
       
+      // CRÍTICO: Invalidar cache da área individual para MapInfoCard/sidebar
+      queryClient.invalidateQueries({ queryKey: ["/api/areas", area.id] });
+      
       toast({
         title: "Roçagem Registrada!",
-        description: `Roçagem de ${area?.endereco} registrada com sucesso.`,
+        description: `Roçagem de ${area.endereco} registrada com sucesso.`,
       });
       handleOpenChange(false);
     },
