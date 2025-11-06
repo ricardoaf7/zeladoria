@@ -8,13 +8,15 @@ Três arquivos foram gerados para você:
    - Contém apenas a estrutura das tabelas (DDL)
    - Use se quiser criar as tabelas manualmente primeiro
 
-2. **`export_data.sql`** (281 KB)
+2. **`export_data.sql`** (354 KB)
    - Contém apenas os dados (INSERT statements)
    - Use após criar as tabelas
+   - ✅ **FORMATO CORRIGIDO** - Agora usa INSERT ao invés de COPY
 
-3. **`export_complete.sql`** (286 KB) ⭐ **RECOMENDADO**
+3. **`export_complete.sql`** (358 KB) ⭐ **RECOMENDADO**
    - Contém estrutura + dados completos
    - Importação em um único passo
+   - ✅ **FORMATO CORRIGIDO** - Compatível com Supabase
 
 ## 🚀 Passo a Passo para Importar no Supabase
 
