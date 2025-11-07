@@ -37,6 +37,20 @@ export default function Dashboard() {
   const [timeRangeFilter, setTimeRangeFilter] = useState<TimeRangeFilter>(null);
   const [customFilterDateRange, setCustomFilterDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
   const mapRef = useRef<L.Map | null>(null);
+  const ignoreSearchClearRef = useRef(false); // Flag para ignorar limpeza após seleção
+
+  // Limpar selectedArea quando busca é limpa MANUALMENTE (não após seleção)
+  useEffect(() => {
+    if (filters.search === '') {
+      // Ignorar se foi uma limpeza após seleção de área
+      if (ignoreSearchClearRef.current) {
+        ignoreSearchClearRef.current = false;
+        return;
+      }
+      setSelectedArea(null);
+      setShowMapCard(false);
+    }
+  }, [filters.search]);
 
   const handleServiceSelect = (service: string) => {
     setSelectedService(service);
@@ -274,6 +288,9 @@ export default function Dashboard() {
     // Selecionar área e abrir MapInfoCard
     setSelectedArea(area);
     setShowMapCard(true);
+    
+    // Setar flag para ignorar próxima limpeza de search
+    ignoreSearchClearRef.current = true;
     
     // No mobile, minimizar o BottomSheet para ver melhor
     if (isMobile) {

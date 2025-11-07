@@ -179,7 +179,7 @@ export function MapHeaderBar({
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
-    onSearchChange('');
+    onSearchChange(''); // Limpar busca (mas dashboard ignora com ignoreSearchClearRef)
     
     setShowSuggestions(false);
     inputRef.current?.blur();
