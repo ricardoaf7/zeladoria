@@ -130,6 +130,11 @@ export default function Dashboard() {
           return area.status === 'Em Execução';
         }
 
+        // Filtro "Sem Registro" - áreas sem histórico de roçagem
+        if (deferredTimeRangeFilter === 'no-history') {
+          return !area.ultimaRocagem;
+        }
+
         // Para outros filtros, calcular dias até próxima previsão
         const days = getDaysUntilNextMowing(area);
         

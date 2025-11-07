@@ -9,14 +9,15 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export type TimeRangeFilter = 
-  | 'executing' // Executando
-  | '0-5'       // 0-5 dias
-  | '6-15'      // 6-15 dias
-  | '16-25'     // 16-25 dias
-  | '26-40'     // 26-40 dias
-  | '41-45'     // 41-45 dias
-  | 'custom'    // Personalizado
-  | null;       // Todos
+  | 'executing'  // Executando
+  | '0-5'        // 0-5 dias
+  | '6-15'       // 6-15 dias
+  | '16-25'      // 16-25 dias
+  | '26-40'      // 26-40 dias
+  | '41-45'      // 41-45 dias
+  | 'no-history' // Sem registro
+  | 'custom'     // Personalizado
+  | null;        // Todos
 
 interface MapLegendProps {
   activeFilter: TimeRangeFilter;
@@ -32,6 +33,7 @@ const timeRanges = [
   { value: '16-25' as const, label: '16-25 dias', sublabel: 'Previsão média', color: '#a83e6b' },
   { value: '26-40' as const, label: '26-40 dias', sublabel: 'Previsão distante', color: '#fe8963' },
   { value: '41-45' as const, label: '41-45 dias', sublabel: 'Último do ciclo', color: '#ea3c27' },
+  { value: 'no-history' as const, label: 'Sem Registro', sublabel: 'Nunca roçada', color: '#1e1c3e' },
 ];
 
 export function MapLegend({ 

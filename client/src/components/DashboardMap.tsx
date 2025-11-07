@@ -384,7 +384,13 @@ function getAreaColor(area: ServiceArea, today: Date, isSelected = false, active
     }
   }
 
-  // Sem previsão
+  // Sem previsão - verificar se nunca foi roçada
+  if (!area.ultimaRocagem) {
+    // Área sem histórico de roçagem - cor escura
+    return activeFilter === null ? "#1e1c3e" : "#9ca3af";
+  }
+  
+  // Área roçada mas sem previsão definida
   // Quando filtro "Todas" ativo (null), usar cor laranja
   // Quando filtro específico ativo, usar cinza
   return activeFilter === null ? "#fe8963" : "#9ca3af";

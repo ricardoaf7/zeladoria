@@ -27,6 +27,7 @@ const categoryFilters = [
   { value: '16-25' as const, label: '16-25 dias', color: '#a83e6b', shortLabel: '16-25d' },
   { value: '26-40' as const, label: '26-40 dias', color: '#fe8963', shortLabel: '26-40d' },
   { value: '41-45' as const, label: '41-45 dias', color: '#ea3c27', shortLabel: '41-45d' },
+  { value: 'no-history' as const, label: 'Sem Registro', color: '#1e1c3e', shortLabel: 'S/Reg' },
 ];
 
 // Função auxiliar para escapar caracteres especiais de regex
