@@ -348,6 +348,15 @@ function getAreaColor(area: ServiceArea, today: Date, isSelected = false, active
     return "#10b981";
   }
 
+  // PRIORIDADE: Verificar se nunca foi roçada (sem histórico)
+  // Essas áreas devem ter cor especial independente de ter previsão calculada
+  if (!area.ultimaRocagem) {
+    // Área sem histórico de roçagem - cor escura #1e1c3e
+    // Aparece em roxo quando: filtro "Todas" (null) OU filtro "Sem Registro" ('no-history')
+    // Aparece em cinza quando: qualquer outro filtro específico
+    return (activeFilter === null || activeFilter === 'no-history') ? "#1e1c3e" : "#9ca3af";
+  }
+
   // Sistema baseado em PRÓXIMA previsão (dias ATÉ roçar)
   // Nova paleta de cores personalizada
   if (area.proximaPrevisao) {
@@ -382,12 +391,6 @@ function getAreaColor(area: ServiceArea, today: Date, isSelected = false, active
     else {
       return activeFilter === null ? "#fe8963" : "#9ca3af";
     }
-  }
-
-  // Sem previsão - verificar se nunca foi roçada
-  if (!area.ultimaRocagem) {
-    // Área sem histórico de roçagem - cor escura
-    return activeFilter === null ? "#1e1c3e" : "#9ca3af";
   }
   
   // Área roçada mas sem previsão definida
