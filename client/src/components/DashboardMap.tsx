@@ -128,12 +128,16 @@ export function DashboardMap({
     mapRef.current = map;
 
     // Listener para cliques no mapa (cadastrar nova área)
-    if (onMapClick) {
-      map.on('click', (e: L.LeafletMouseEvent) => {
-        // Só disparar se o clique foi no mapa, não em um marcador
-        // O Leaflet automaticamente previne a propagação se clicar em um marcador
+    const handleMapClick = (e: L.LeafletMouseEvent) => {
+      // Só disparar se o clique foi no mapa, não em um marcador
+      // O Leaflet automaticamente previne a propagação se clicar em um marcador
+      if (onMapClick) {
         onMapClick(e.latlng.lat, e.latlng.lng);
-      });
+      }
+    };
+
+    if (onMapClick) {
+      map.on('click', handleMapClick);
     }
 
     // Listener para atualizar bounds quando o mapa se mover
@@ -156,6 +160,9 @@ export function DashboardMap({
 
     return () => {
       clearTimeout(boundsTimeout);
+      if (onMapClick) {
+        map.off('click', handleMapClick);
+      }
       map.remove();
       mapRef.current = null;
     };

@@ -320,22 +320,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metragem_m2: z.number().positive().optional(),
         lat: z.number().min(-90).max(90),
         lng: z.number().min(-180).max(180),
-        lote: z.number().int().positive().optional(),
-        servico: z.string().default("rocagem"),
+        lote: z.number().int().min(1).max(2).optional(),
+        servico: z.enum(["rocagem", "jardins"]).default("rocagem"),
         status: z.enum(["Pendente", "Em Execução", "Concluído"]).default("Pendente"),
+        ultimaRocagem: z.string().optional(),
       });
 
       const validatedData = createSchema.parse(req.body);
       
+      // Calcular proximaPrevisao se área já foi roçada
+      let proximaPrevisao: string | null = null;
+      if (validatedData.ultimaRocagem) {
+        const { calculateNextMowing } = await import('@shared/schedulingAlgorithm');
+        const tempArea = {
+          id: 0,
+          ultimaRocagem: validatedData.ultimaRocagem,
+          manualSchedule: false,
+        } as any;
+        
+        const result = calculateNextMowing(tempArea);
+        if (result) {
+          proximaPrevisao = result.proximaPrevisao;
+        }
+      }
+      
       const newArea = await storage.createArea({
-        ...validatedData,
+        tipo: validatedData.tipo,
+        endereco: validatedData.endereco,
+        bairro: validatedData.bairro,
+        metragem_m2: validatedData.metragem_m2,
+        lat: validatedData.lat,
+        lng: validatedData.lng,
+        lote: validatedData.lote,
+        servico: validatedData.servico,
+        status: validatedData.status,
         ordem: undefined,
         sequenciaCadastro: undefined,
         history: [],
         polygon: null,
         scheduledDate: null,
-        proximaPrevisao: null,
-        ultimaRocagem: null,
+        proximaPrevisao,
+        ultimaRocagem: validatedData.ultimaRocagem || null,
         manualSchedule: false,
         daysToComplete: undefined,
         registradoPor: null,
