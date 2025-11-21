@@ -23,11 +23,12 @@ interface MapInfoCardProps {
   area: ServiceArea;
   onClose: () => void;
   onRegisterMowing: () => void;
+  onRegisterJardins?: () => void;
   onSetManualForecast: () => void;
   onEdit?: () => void;
 }
 
-export function MapInfoCard({ area, onClose, onRegisterMowing, onSetManualForecast, onEdit }: MapInfoCardProps) {
+export function MapInfoCard({ area, onClose, onRegisterMowing, onRegisterJardins, onSetManualForecast, onEdit }: MapInfoCardProps) {
   const { toast } = useToast();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -67,6 +68,8 @@ export function MapInfoCard({ area, onClose, onRegisterMowing, onSetManualForeca
 
   const daysUntil = getDaysUntilMowing();
   const isExecuting = area.status === "Em Execução";
+  const isJardins = area.servico === "jardins";
+  const isRocagem = area.servico === "rocagem" || !area.servico;
 
   return (
     <Card className="w-80 shadow-lg border-2 max-h-[calc(100vh-120px)] overflow-y-auto" data-testid="map-info-card">
@@ -111,33 +114,72 @@ export function MapInfoCard({ area, onClose, onRegisterMowing, onSetManualForeca
             </div>
           )}
 
-          <div className="flex items-center gap-2 text-xs">
-            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-muted-foreground">Última Roçagem:</span>
-            <span className="font-medium" data-testid="text-ultima-rocagem">
-              {area.ultimaRocagem ? formatDateBR(area.ultimaRocagem) : "Nunca roçada"}
-            </span>
-          </div>
+          {isRocagem && (
+            <>
+              <div className="flex items-center gap-2 text-xs">
+                <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Última Roçagem:</span>
+                <span className="font-medium" data-testid="text-ultima-rocagem">
+                  {area.ultimaRocagem ? formatDateBR(area.ultimaRocagem) : "Nunca roçada"}
+                </span>
+              </div>
 
-          {area.proximaPrevisao && (
-            <div className="flex items-center gap-2 text-xs flex-wrap">
-              <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-muted-foreground">Previsão:</span>
-              <span className="font-medium" data-testid="text-previsao">
-                {formatDateBR(area.proximaPrevisao)}
-                {daysUntil !== null && (
-                  <span className="ml-1 text-muted-foreground">
-                    ({daysUntil === 0 ? 'hoje' : daysUntil === 1 ? 'amanhã' : `${daysUntil} dias`})
+              {area.proximaPrevisao && (
+                <div className="flex items-center gap-2 text-xs flex-wrap">
+                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-muted-foreground">Previsão:</span>
+                  <span className="font-medium" data-testid="text-previsao">
+                    {formatDateBR(area.proximaPrevisao)}
+                    {daysUntil !== null && (
+                      <span className="ml-1 text-muted-foreground">
+                        ({daysUntil === 0 ? 'hoje' : daysUntil === 1 ? 'amanhã' : `${daysUntil} dias`})
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-              {area.manualSchedule && (
-                <Badge variant="outline" className="text-[10px] h-4 px-1.5 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700" data-testid="badge-manual-forecast">
-                  <CalendarClock className="h-2.5 w-2.5 mr-0.5" />
-                  Manual
-                </Badge>
+                  {area.manualSchedule && (
+                    <Badge variant="outline" className="text-[10px] h-4 px-1.5 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700" data-testid="badge-manual-forecast">
+                      <CalendarClock className="h-2.5 w-2.5 mr-0.5" />
+                      Manual
+                    </Badge>
+                  )}
+                </div>
               )}
-            </div>
+            </>
+          )}
+
+          {isJardins && (
+            <>
+              {area.ultimaManutencao && (
+                <div className="flex items-center gap-2 text-xs">
+                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-muted-foreground">Última Manutenção:</span>
+                  <span className="font-medium">{formatDateBR(area.ultimaManutencao)}</span>
+                </div>
+              )}
+              {area.ultimaIrrigacao && (
+                <div className="flex items-center gap-2 text-xs">
+                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-muted-foreground">Última Irrigação:</span>
+                  <span className="font-medium">{formatDateBR(area.ultimaIrrigacao)}</span>
+                </div>
+              )}
+              {area.ultimaPlantio && (
+                <div className="flex items-center gap-2 text-xs">
+                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-muted-foreground">Último Plantio:</span>
+                  <span className="font-medium">{formatDateBR(area.ultimaPlantio)}</span>
+                </div>
+              )}
+              {area.observacoes && (
+                <div className="flex items-start gap-2 text-xs">
+                  <Info className="h-3.5 w-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <span className="text-muted-foreground">Observações:</span>
+                    <p className="text-xs mt-1">{area.observacoes}</p>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 
