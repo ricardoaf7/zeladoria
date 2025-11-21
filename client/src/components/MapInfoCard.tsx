@@ -1,21 +1,59 @@
 import { useState } from "react";
-import { X, Calendar, MapPin, Ruler, CheckCircle2, Info, ChevronDown, ChevronUp, Hash, CalendarClock } from "lucide-react";
+import { X, Calendar, MapPin, Ruler, CheckCircle2, Info, ChevronDown, ChevronUp, Hash, CalendarClock, Trash2, Edit2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import type { ServiceArea } from "@shared/schema";
 import { formatDateBR } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface MapInfoCardProps {
   area: ServiceArea;
   onClose: () => void;
   onRegisterMowing: () => void;
   onSetManualForecast: () => void;
+  onEdit?: () => void;
 }
 
-export function MapInfoCard({ area, onClose, onRegisterMowing, onSetManualForecast }: MapInfoCardProps) {
+export function MapInfoCard({ area, onClose, onRegisterMowing, onSetManualForecast, onEdit }: MapInfoCardProps) {
+  const { toast } = useToast();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const deleteAreaMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("DELETE", `/api/areas/${area.id}`, {});
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Área Deletada",
+        description: `${area.endereco} foi removida com sucesso.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/areas/light", "rocagem"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/areas/light", "jardins"] });
+      onClose();
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao Deletar",
+        description: "Não foi possível deletar a área.",
+      });
+    },
+  });
   const getDaysUntilMowing = (): number | null => {
     if (!area.proximaPrevisao) return null;
     const today = new Date();
@@ -198,7 +236,57 @@ export function MapInfoCard({ area, onClose, onRegisterMowing, onSetManualForeca
               </>
             )}
           </Button>
+
+          <Separator />
+
+          <div className="flex gap-2">
+            {onEdit && (
+              <Button
+                onClick={onEdit}
+                variant="outline"
+                className="flex-1 h-8 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700"
+                data-testid="button-edit-area"
+              >
+                <Edit2 className="h-3.5 w-3.5 mr-1" />
+                Editar
+              </Button>
+            )}
+            <Button
+              onClick={() => setShowDeleteConfirm(true)}
+              variant="outline"
+              className="flex-1 h-8 text-red-600 dark:text-red-400 border-red-300 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+              data-testid="button-delete-area"
+              disabled={deleteAreaMutation.isPending}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1" />
+              Deletar
+            </Button>
+          </div>
         </div>
+
+        <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+          <AlertDialogContent data-testid="dialog-delete-confirm">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Deletar Área?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tem certeza que deseja deletar {area.endereco}? Esta ação não pode ser desfeita.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="flex gap-2">
+              <AlertDialogCancel data-testid="button-cancel-delete">
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => deleteAreaMutation.mutate()}
+                className="bg-red-600 hover:bg-red-700"
+                disabled={deleteAreaMutation.isPending}
+                data-testid="button-confirm-delete"
+              >
+                {deleteAreaMutation.isPending ? "Deletando..." : "Deletar"}
+              </AlertDialogAction>
+            </div>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );

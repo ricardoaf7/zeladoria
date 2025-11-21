@@ -100,6 +100,26 @@ function convertToSupabaseCSV(areas: ServiceArea[]): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Endpoint para deletar área
+  app.delete("/api/areas/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "ID inválido" });
+      }
+
+      const deleted = await storage.deleteArea(id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Área não encontrada" });
+      }
+
+      res.json({ success: true, message: "Área deletada com sucesso" });
+    } catch (error) {
+      console.error("Delete area error:", error);
+      res.status(500).json({ error: "Falha ao deletar área" });
+    }
+  });
+
   // Endpoint para upload de fotos
   app.post("/api/photo/upload", upload.single("file"), async (req, res) => {
     try {

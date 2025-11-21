@@ -166,6 +166,15 @@ export class DbStorage implements IStorage {
     return this.mapDbAreaToServiceArea(results[0]);
   }
 
+  async deleteArea(id: number): Promise<boolean> {
+    const results = await this.db
+      .delete(serviceAreas)
+      .where(eq(serviceAreas.id, id))
+      .returning();
+    
+    return results.length > 0;
+  }
+
   async addHistoryEntry(
     areaId: number, 
     entry: { date: string; status: string; type?: 'completed' | 'forecast'; observation?: string }

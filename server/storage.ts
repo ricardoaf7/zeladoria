@@ -11,6 +11,7 @@ export interface IStorage {
   updateAreaPolygon(id: number, polygon: Array<{ lat: number; lng: number }>): Promise<ServiceArea | undefined>;
   updateAreaPosition(id: number, lat: number, lng: number): Promise<ServiceArea | undefined>;
   updateArea(id: number, data: Partial<ServiceArea>): Promise<ServiceArea | undefined>;
+  deleteArea(id: number): Promise<boolean>;
   addHistoryEntry(areaId: number, entry: { date: string; status: string; type?: 'completed' | 'forecast'; observation?: string }): Promise<ServiceArea | undefined>;
   registerDailyMowing(areaIds: number[], date: string, type: 'completed' | 'forecast'): Promise<void>;
   clearSimulationData(serviceType: string): Promise<number>;
@@ -259,6 +260,22 @@ export class MemStorage implements IStorage {
 
     Object.assign(area, data);
     return area;
+  }
+
+  async deleteArea(id: number): Promise<boolean> {
+    const rocIndex = this.rocagemAreas.findIndex(a => a.id === id);
+    if (rocIndex !== -1) {
+      this.rocagemAreas.splice(rocIndex, 1);
+      return true;
+    }
+
+    const jarIndex = this.jardinsAreas.findIndex(a => a.id === id);
+    if (jarIndex !== -1) {
+      this.jardinsAreas.splice(jarIndex, 1);
+      return true;
+    }
+
+    return false;
   }
 
   async addHistoryEntry(areaId: number, entry: { date: string; status: string; type?: 'completed' | 'forecast'; observation?: string }): Promise<ServiceArea | undefined> {
