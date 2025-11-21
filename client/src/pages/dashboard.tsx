@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MapInfoCard } from "@/components/MapInfoCard";
 import { QuickRegisterModal } from "@/components/QuickRegisterModal";
+import { JardinsRegisterModal } from "@/components/JardinsRegisterModal";
 import { ManualForecastModal } from "@/components/ManualForecastModal";
 import { NewAreaModal } from "@/components/NewAreaModal";
 import { EditAreaModal } from "@/components/EditAreaModal";
@@ -27,6 +28,7 @@ export default function Dashboard() {
   const [selectedArea, setSelectedArea] = useState<ServiceArea | null>(null);
   const [showMapCard, setShowMapCard] = useState(false);
   const [showQuickRegisterModal, setShowQuickRegisterModal] = useState(false);
+  const [showJardinsRegisterModal, setShowJardinsRegisterModal] = useState(false);
   const [showManualForecastModal, setShowManualForecastModal] = useState(false);
   const [showNewAreaModal, setShowNewAreaModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -271,6 +273,11 @@ export default function Dashboard() {
     setShowQuickRegisterModal(true);
   };
 
+  const handleOpenJardinsRegister = () => {
+    setShowMapCard(false);
+    setShowJardinsRegisterModal(true);
+  };
+
   const handleOpenManualForecast = () => {
     setShowMapCard(false);
     setShowManualForecastModal(true);
@@ -410,6 +417,7 @@ export default function Dashboard() {
                 area={selectedArea}
                 onClose={handleCloseMapCard}
                 onRegisterMowing={handleOpenQuickRegister}
+                onRegisterJardins={handleOpenJardinsRegister}
                 onSetManualForecast={handleOpenManualForecast}
                 onEdit={handleOpenEdit}
               />
@@ -437,6 +445,13 @@ export default function Dashboard() {
             area={selectedArea}
             open={showQuickRegisterModal}
             onOpenChange={setShowQuickRegisterModal}
+          />
+
+          {/* Modal de registro - Jardins */}
+          <JardinsRegisterModal
+            area={selectedArea}
+            open={showJardinsRegisterModal}
+            onOpenChange={setShowJardinsRegisterModal}
           />
 
           {/* Modal de cadastro de nova área */}
@@ -547,6 +562,7 @@ export default function Dashboard() {
                   area={selectedArea}
                   onClose={handleCloseMapCard}
                   onRegisterMowing={handleOpenQuickRegister}
+                  onRegisterJardins={handleOpenJardinsRegister}
                   onSetManualForecast={handleOpenManualForecast}
                   onEdit={handleOpenEdit}
                 />
@@ -561,6 +577,13 @@ export default function Dashboard() {
         area={selectedArea}
         open={showQuickRegisterModal}
         onOpenChange={setShowQuickRegisterModal}
+      />
+
+      {/* Modal de registro - Jardins */}
+      <JardinsRegisterModal
+        area={selectedArea}
+        open={showJardinsRegisterModal}
+        onOpenChange={setShowJardinsRegisterModal}
       />
 
       {/* Modal de previsão manual */}

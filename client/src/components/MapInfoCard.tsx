@@ -241,24 +241,39 @@ export function MapInfoCard({ area, onClose, onRegisterMowing, onRegisterJardins
 
         {/* Botões de ação */}
         <div className="flex flex-col gap-2">
-          <Button
-            onClick={onRegisterMowing}
-            className="w-full h-9 bg-green-600 hover:bg-green-700 text-white"
-            data-testid="button-register-mowing"
-          >
-            <CheckCircle2 className="h-4 w-4 mr-2" />
-            Registrar Roçagem
-          </Button>
-          
-          <Button
-            onClick={onSetManualForecast}
-            variant="outline"
-            className="w-full h-9 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950"
-            data-testid="button-set-manual-forecast"
-          >
-            <CalendarClock className="h-4 w-4 mr-2" />
-            Definir Previsão Manual
-          </Button>
+          {isRocagem && (
+            <>
+              <Button
+                onClick={onRegisterMowing}
+                className="w-full h-9 bg-green-600 hover:bg-green-700 text-white"
+                data-testid="button-register-mowing"
+              >
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Registrar Roçagem
+              </Button>
+              
+              <Button
+                onClick={onSetManualForecast}
+                variant="outline"
+                className="w-full h-9 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950"
+                data-testid="button-set-manual-forecast"
+              >
+                <CalendarClock className="h-4 w-4 mr-2" />
+                Definir Previsão Manual
+              </Button>
+            </>
+          )}
+
+          {isJardins && onRegisterJardins && (
+            <Button
+              onClick={onRegisterJardins}
+              className="w-full h-9 bg-green-600 hover:bg-green-700 text-white"
+              data-testid="button-register-jardins"
+            >
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Registrar
+            </Button>
+          )}
           
           <Button
             variant="outline"
