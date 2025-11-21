@@ -6,6 +6,7 @@ import { MapInfoCard } from "@/components/MapInfoCard";
 import { QuickRegisterModal } from "@/components/QuickRegisterModal";
 import { ManualForecastModal } from "@/components/ManualForecastModal";
 import { NewAreaModal } from "@/components/NewAreaModal";
+import { EditAreaModal } from "@/components/EditAreaModal";
 import { MapHeaderBar } from "@/components/MapHeaderBar";
 import { ExportDialog } from "@/components/ExportDialog";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
@@ -28,6 +29,7 @@ export default function Dashboard() {
   const [showQuickRegisterModal, setShowQuickRegisterModal] = useState(false);
   const [showManualForecastModal, setShowManualForecastModal] = useState(false);
   const [showNewAreaModal, setShowNewAreaModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [newAreaCoords, setNewAreaCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedService, setSelectedService] = useState<string>('');
   const [bottomSheetState, setBottomSheetState] = useState<BottomSheetState>("minimized");
@@ -274,6 +276,11 @@ export default function Dashboard() {
     setShowManualForecastModal(true);
   };
 
+  const handleOpenEdit = () => {
+    setShowMapCard(false);
+    setShowEditModal(true);
+  };
+
   const handleMapClick = (lat: number, lng: number) => {
     setNewAreaCoords({ lat, lng });
     setShowNewAreaModal(true);
@@ -404,6 +411,7 @@ export default function Dashboard() {
                 onClose={handleCloseMapCard}
                 onRegisterMowing={handleOpenQuickRegister}
                 onSetManualForecast={handleOpenManualForecast}
+                onEdit={handleOpenEdit}
               />
             </div>
           )}
@@ -440,6 +448,13 @@ export default function Dashboard() {
               lng={newAreaCoords.lng}
             />
           )}
+
+          {/* Modal de edição de área */}
+          <EditAreaModal
+            area={selectedArea}
+            open={showEditModal}
+            onOpenChange={setShowEditModal}
+          />
         </main>
       </div>
     );
@@ -520,8 +535,8 @@ export default function Dashboard() {
               onMapClick={handleMapClick}
               filteredAreaIds={hasActiveFilters ? new Set(filteredRocagemAreas.map(a => a.id)) : undefined}
               searchQuery={filters.search}
-              mapRef={mapRef}
               activeFilter={timeRangeFilter}
+              mapRef={mapRef}
               selectedAreaId={selectedArea?.id || null}
             />
 
@@ -533,6 +548,7 @@ export default function Dashboard() {
                   onClose={handleCloseMapCard}
                   onRegisterMowing={handleOpenQuickRegister}
                   onSetManualForecast={handleOpenManualForecast}
+                  onEdit={handleOpenEdit}
                 />
               </div>
             )}
@@ -569,6 +585,13 @@ export default function Dashboard() {
           lng={newAreaCoords.lng}
         />
       )}
+
+      {/* Modal de edição de área */}
+      <EditAreaModal
+        area={selectedArea}
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+      />
     </SidebarProvider>
   );
 }
